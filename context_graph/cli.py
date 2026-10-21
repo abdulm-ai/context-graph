@@ -15,6 +15,7 @@ import argparse
 import json
 import math
 import os
+import signal
 import sys
 from typing import Any
 
@@ -255,6 +256,8 @@ def main(argv: list[str] | None = None) -> int:
     sp = sub.add_parser("import", help="import a transcript JSONL")
     sp.add_argument("transcript")
     sp.set_defaults(fn=cmd_import)
+    if hasattr(signal, "SIGPIPE") and argv is None:
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)  # `ctx show | head` should exit quietly
     args = p.parse_args(argv)
     args.cwd = os.path.abspath(args.cwd)
     return args.fn(args)

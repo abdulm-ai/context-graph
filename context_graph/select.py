@@ -10,7 +10,7 @@ from . import budget as bud
 from .atoms import Atom
 from .decay import decay
 from .graph import Graph
-from .relevance import shortest_path_relevance
+from .relevance import heat_kernel, shortest_path_relevance
 
 MIN_VALUE = 1e-6
 
@@ -45,6 +45,8 @@ def focus_sources(atoms: list[Atom], n_turns: int) -> dict[str, float]:
 
 
 def relevance_scores(g: Graph, sources: dict[str, float], cfg: dict[str, Any]) -> dict[str, float]:
+    if cfg.get("relevance") == "diffusion":
+        return heat_kernel(g, sources, float(cfg.get("diffusion_time", 2.0)))
     return shortest_path_relevance(g, sources)
 
 
