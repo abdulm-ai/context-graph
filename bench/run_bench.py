@@ -154,7 +154,7 @@ class Run:
 
     def call(self, prompt: str, env: dict, **kw) -> cc.Call:
         kw.setdefault("model", self.args.model)
-        kw.setdefault("plugin_dir", ROOT)
+        kw.setdefault("plugin_dir", self.args.plugin_root)
         kw.setdefault("max_budget_usd", self.args.call_budget)
         c = cc.run(prompt, self.repo, env, **kw)
         if not c.ok and c.cost_usd == 0:
@@ -291,6 +291,8 @@ def main() -> int:
     ap.add_argument("--total-budget", type=float, default=40.0, help="stop when total spend passes this")
     ap.add_argument("--work", default=os.environ.get("BENCH_WORK", "/tmp/cg-bench"))
     ap.add_argument("--out", default=os.path.join(ROOT, "results", "raw"))
+    ap.add_argument("--plugin-root", default=ROOT,
+                    help="plugin directory to load, e.g. a worktree of an earlier commit (default: this checkout)")
     ap.add_argument("--no-followup", action="store_true")
     ap.add_argument("--reuse-base", action="store_true", help="reuse a finished base session of the same run id")
     ap.add_argument("--dry-run", action="store_true")
@@ -315,7 +317,9 @@ def main() -> int:
 
     meta = {"claude_version": cc.claude_version(), "model_arg": args.model,
             "scenario": "holdout" if args.runs[0][0].upper() == "H" else "main", "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "runs": args.runs, "turns": args.turns, "budget_replace": BUDGET, "methods": {k: METHODS[k] for k in METHODS}}
+            "runs": args.runs, "turns": args.turns, "plugin_root": args.plugin_root,
+            "plugin_commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=args.plugin_root, capture_output=True,
+                                            text=True).stdout.strip(), "budget_replace": BUDGET, "methods": {k: METHODS[k] for k in METHODS}}
     os.makedirs(args.out, exist_ok=True)
     runs = [Run(r, args) for r in args.runs]
     with cf.ThreadPoolExecutor(max_workers=max(1, args.parallel)) as pool:

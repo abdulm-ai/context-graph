@@ -5,6 +5,8 @@ Atom kinds:
   constraint  a rule the user stated (pinned, verbatim)         id k<turn>.<n>
   decision    a decision, rejected approach or root cause,
               stated by the user or the assistant (pinned)      id d<turn>.<n>
+  fact        a specific fact the user stated in passing: a
+              host, a name, a ticket, a date (pinned)           id n<turn>.<n>
   reply       the assistant's final message of a turn           id r<turn>
   command     a Bash command with its exit status               id t<seq>
   edit        an Edit / Write / MultiEdit                        id t<seq>
@@ -31,7 +33,7 @@ from typing import Any, Iterable
 from .events import PROMPT, REPLY, TOOL, Event, tool_output_text
 from .tokens import estimate
 
-PINNED_KINDS = ("constraint", "decision")
+PINNED_KINDS = ("constraint", "decision", "fact")
 
 
 @dataclass
@@ -67,15 +69,14 @@ _IMPERATIVE_START = re.compile(
 _CONSTRAINT = re.compile(
     r"\b(?:must|mustn'?t|shall|should never|should always|should not|shouldn'?t|"
     r"not allowed|is required|are required|required to|from now on|going forward|"
-    r"make sure|ensure that|never|hard rule|rule:|constraint:|requirement:|"
-    r"remember:|important:)\b",
+    r"make sure|ensure that|never|hard rule)\b|\b(?:rule|constraint|requirement|remember|important)\s*:",
     re.I,
 )
 _DECISION_USER = re.compile(
     r"\b(?:let'?s (?:use|go with|keep|switch|drop|stick with|not)|we'?ll (?:use|go with|keep)|"
-    r"we will (?:use|go with|keep)|i(?:'ve| have)? decided|decided|decision:|go with|stick with|"
+    r"we will (?:use|go with|keep)|i(?:'ve| have)? decided|decided|go with|stick with|"
     r"we tried|tried that|didn'?t work|did not work|rejected|ruled out|"
-    r"root cause|the cause (?:is|was)|caused by)\b",
+    r"root cause|the cause (?:is|was)|caused by)\b|\bdecision\s*:",
     re.I,
 )
 _DECISION_ASSISTANT = re.compile(
@@ -92,6 +93,10 @@ _TASK_START = re.compile(
     re.I,
 )
 _MAX_CONTINUATION = 2
+# Something specific a model cannot get back from the code: a number, an
+# identifier with inner punctuation (ledger-db-07.internal, FIN-2291, legacy/),
+# an acronym, or a capitalised word that is not the first word (a name).
+_SPECIFIC = re.compile(r"\d|[A-Za-z][-_./][A-Za-z0-9]|[A-Za-z]/(?:\s|$)|\b[A-Z]{2,}\b|(?<=\s)(?!I\b)[A-Z][a-z]+")
 _STRONG_DECISION = re.compile(r"\b(?:root cause|decided|decision|rejected|ruled out)\b", re.I)
 _MAX_ASSISTANT_DECISIONS = 3
 _MAX_TURN_CHARS = 1500  # longer prompts (pasted logs) are clipped in the pack, kept whole in the graph
@@ -142,6 +147,20 @@ def is_constraint(sentence: str) -> bool:
     if sentence.endswith("?"):
         return False
     return bool(_IMPERATIVE_START.search(sentence) or _CONSTRAINT.search(sentence))
+
+
+def is_stated_fact(sentence: str) -> bool:
+    """A declarative user sentence with something specific in it.
+
+    Questions, task requests, and sentences already taken as rules or
+    decisions are not facts. Very short or very long sentences are skipped.
+    """
+    if sentence.endswith("?") or _TASK_START.search(sentence):
+        return False
+    words = sentence.split()
+    if not 4 <= len(words) <= 60:
+        return False
+    return bool(_SPECIFIC.search(sentence))
 
 
 def find_paths(text: str) -> list[str]:
@@ -342,19 +361,31 @@ def extract_atoms(events: Iterable[Event], cwd: str = "", chars_per_token: float
             u = Atom(f"u{ev.turn}", "turn", ev.turn, ev.seq, text, f'user: "{shown}"', "user",
                      files=[_norm_path(p, cwd) for p in find_paths(text)], symbols=find_symbols(text))
             atoms.append(u)
-            n_k = n_d = 0
+            n_k = n_d = n_f = 0
             sents = split_sentences(text)
+            absorbed: set[int] = set()
             for i, s in enumerate(sents):
+                if i in absorbed:
+                    continue
                 kind = ("constraint" if is_constraint(s) else
-                        "decision" if _DECISION_USER.search(s) and not s.endswith("?") else None)
+                        "decision" if _DECISION_USER.search(s) and not s.endswith("?") else
+                        "fact" if is_stated_fact(s) else None)
                 if kind is None:
+                    continue
+                if kind == "fact":
+                    n_f += 1
+                    atoms.append(Atom(f"n{ev.turn}.{n_f}", kind, ev.turn, ev.seq, s, s, "user",
+                                      files=[_norm_path(p, cwd) for p in find_paths(s)],
+                                      symbols=find_symbols(s), pinned=True, parent=u.id))
                     continue
                 # A rule is often explained in the next sentence ("Amounts are integer
                 # cents end to end."). Keep that with it, up to the next rule or task.
-                for nxt in sents[i + 1: i + 1 + _MAX_CONTINUATION]:
+                for j in range(i + 1, min(len(sents), i + 1 + _MAX_CONTINUATION)):
+                    nxt = sents[j]
                     if is_constraint(nxt) or _DECISION_USER.search(nxt) or _TASK_START.search(nxt) or nxt.endswith("?"):
                         break
                     s = f"{s} {nxt}"
+                    absorbed.add(j)
                 if kind == "constraint":
                     n_k += 1
                     aid = f"k{ev.turn}.{n_k}"

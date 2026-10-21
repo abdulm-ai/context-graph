@@ -20,13 +20,13 @@ from .atoms import Atom
 # Link strengths. These are priors, not fitted values; the benchmark measures
 # the end result, and `ctx explain` prints the reasons behind every path.
 P_FILE = {"edit": 0.8, "error": 0.8, "command": 0.6, "lookup": 0.5, "turn": 0.6,
-          "constraint": 0.7, "decision": 0.7, "reply": 0.5, "tool": 0.4}
+          "constraint": 0.7, "decision": 0.7, "fact": 0.7, "reply": 0.5, "tool": 0.4}
 P_SYMBOL_MAX = 0.6
 SYMBOL_MAX_DF = 12  # a symbol used by more atoms than this says little
 P_FIX = 0.9  # error -> the next edit of the same file (within FIX_WINDOW turns)
 FIX_WINDOW = 3
 P_ERROR_OUTPUT = 0.95  # error -> the command that produced it
-P_STATED_IN = 0.9  # constraint/decision -> the turn or reply it was stated in
+P_STATED_IN = 0.9  # constraint/decision/fact -> the turn or reply it was stated in
 P_IN_TURN = {"reply": 0.8, "command": 0.6, "edit": 0.6, "lookup": 0.5, "tool": 0.5, "error": 0.6}
 P_NEXT_TURN = 0.5
 P_NEXT_TOOL = 0.4
@@ -109,7 +109,7 @@ class Graph:
 
         # stated in
         for a in order:
-            if a.kind in ("constraint", "decision") and a.parent:
+            if a.kind in ("constraint", "decision", "fact") and a.parent:
                 self.link(a.id, a.parent, P_STATED_IN, "stated in")
 
         # temporal adjacency

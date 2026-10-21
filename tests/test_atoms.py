@@ -1,7 +1,9 @@
 import os
 import unittest
 
-from context_graph.atoms import extract_atoms, find_paths, find_symbols, is_constraint, split_sentences
+from context_graph.atoms import (extract_atoms, find_paths, find_symbols, is_constraint, is_stated_fact,
+                                 split_sentences)
+from context_graph.events import Event
 from context_graph.transcript import parse_transcript
 
 FIX = os.path.join(os.path.dirname(__file__), "fixtures", "session_basic.jsonl")
@@ -26,6 +28,35 @@ class RulesTest(unittest.TestCase):
             self.assertTrue(is_constraint(s), s)
         for s in no:
             self.assertFalse(is_constraint(s), s)
+
+    def test_stated_facts(self):
+        yes = [
+            "For context, the production database lives on db-07.internal, port 6432.",
+            "By the way, the finance contact for reports is Priya Raman.",
+            "This work is tracked in the ticket FIN-2291.",
+            "Our fiscal year starts on April 1.",
+        ]
+        no = [
+            "Run the tests and show me the output.",
+            "Is the database on db-07?",
+            "Sounds good to me.",
+            "that looks right now",
+        ]
+        for s in yes:
+            self.assertTrue(is_stated_fact(s), s)
+        for s in no:
+            self.assertFalse(is_stated_fact(s), s)
+
+    def test_prefixed_rules_and_decisions(self):
+        self.assertTrue(is_constraint("Rule: amounts are cents."))
+        atoms = extract_atoms([Event(1, 1, "prompt", {"text": "Decision: we use SQLite. Add a table."})])
+        self.assertEqual([a.kind for a in atoms if a.pinned], ["decision"])
+
+    def test_explanation_is_not_pinned_twice(self):
+        atoms = extract_atoms([Event(1, 1, "prompt", {
+            "text": "Don't touch legacy/. The payments team owns it since 2019. Show me the log."})])
+        pins = [a.text for a in atoms if a.pinned]
+        self.assertEqual(pins, ["Don't touch legacy/. The payments team owns it since 2019."])
 
     def test_sentences_skip_code_fences(self):
         text = "First line. Second one!\n```\nnever = 1\n```\n- Bullet item"

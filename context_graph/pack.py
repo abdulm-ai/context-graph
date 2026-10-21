@@ -10,14 +10,14 @@ REPLACE_HEADER = (
     "# Carried-over context (context-graph)\n"
     "The conversation was cleared. This is what was kept from it: {kept} of {total} items from the "
     "session graph, chosen by relevance to the latest request and by recency, about {tokens} tokens. "
-    "Items under PINNED are the user's constraints and the decisions already made, copied word for "
-    "word: follow them. Each item starts with its [id]: `{ctx} get <id>` with Bash prints that item's full "
+    "Items under PINNED are the user's constraints and stated facts and the decisions already made, "
+    "copied word for word: follow them. Each item starts with its [id]: `{ctx} get <id>` with Bash prints that item's full "
     "text, such as the whole output of a command."
 )
 ASSIST_HEADER = (
     "# Pinned context (context-graph)\n"
     "Kept from before compaction, in addition to the summary. Items under PINNED are the user's "
-    "constraints and the decisions already made, copied word for word: follow them even where the "
+    "constraints and stated facts and the decisions already made, copied word for word: follow them even where the "
     "summary paraphrases or omits them. Each item starts with its [id]: `{ctx} get <id>` with Bash prints "
     "that item's full text."
 )
@@ -65,7 +65,7 @@ def render(sel: Selection, atoms: list[Atom], mode: str = "replace", ctx: str = 
         pins = [a for a in kept if a.pinned]
         rest = [a for a in kept if not a.pinned and a.id != latest]
         if pins:
-            body.append("## PINNED: constraints and decisions (verbatim)")
+            body.append("## PINNED: constraints, decisions and stated facts (verbatim)")
             body += [_line(a, with_source=True) for a in pins]
         if rest:
             body.append("## Session record (most relevant items, oldest first)")
