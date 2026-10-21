@@ -244,7 +244,8 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("id")
     sel_opts(sp)
     sp.set_defaults(fn=cmd_explain)
-    sp = sub.add_parser("get", help="full text of an atom")
+    sp = sub.add_parser("get", help="full text of an item: the [id] in a pack or in a trimmed output, "
+                                    "e.g. the whole output of a command")
     sp.add_argument("id")
     sp.add_argument("--lines", help="line range, e.g. 100:200")
     sp.set_defaults(fn=cmd_get)

@@ -11,13 +11,15 @@ REPLACE_HEADER = (
     "The conversation was cleared. This is what was kept from it: {kept} of {total} items from the "
     "session graph, chosen by relevance to the latest request and by recency, about {tokens} tokens. "
     "Items under PINNED are the user's constraints and the decisions already made, copied word for "
-    "word: follow them. To read the full text of any item, run `{ctx} get <id>` with Bash."
+    "word: follow them. Each item starts with its [id]: `{ctx} get <id>` with Bash prints that item's full "
+    "text, such as the whole output of a command."
 )
 ASSIST_HEADER = (
     "# Pinned context (context-graph)\n"
     "Kept from before compaction, in addition to the summary. Items under PINNED are the user's "
     "constraints and the decisions already made, copied word for word: follow them even where the "
-    "summary paraphrases or omits them. To read the full text of any item, run `{ctx} get <id>` with Bash."
+    "summary paraphrases or omits them. Each item starts with its [id]: `{ctx} get <id>` with Bash prints "
+    "that item's full text."
 )
 RECENCY_HEADER = (
     "# Carried-over context (last part of the conversation)\n"

@@ -35,12 +35,12 @@ from context_graph.store import Store  # noqa: E402
 from context_graph.transcript import parse_transcript  # noqa: E402
 
 TURN1 = ("Project rule: never put the word banana in any file in this repository. "
-         "Create notes.txt containing the single line alpha. Then run `seq 1 300` with Bash "
-         "and tell me the last number it printed.")
+         "Create notes.txt containing the single line alpha. Then run exactly `seq 1 300` with Bash, "
+         "with no pipe or redirection, and tell me the last number it printed.")
 TURN2 = "Run `python3 -c \"import nothing_here\"` with Bash and tell me the error in one line."
-PROBE = ("Without reading any files: what is the project rule I gave you about a word? Then use the "
-         "`ctx` command with Bash to fetch line 150 of the output of the seq command, and tell me "
-         "exactly what that line says.")
+PROBE = ("Without reading any files: what is the project rule I gave you about a word? Then, without "
+         "running seq again, page the stored output of the earlier seq command back with `ctx get` and the "
+         "id of that item, and tell me exactly what line 150 of it says.")
 
 
 def main() -> int:
@@ -108,7 +108,6 @@ def main() -> int:
                         if isinstance(b, dict) and b.get("type") == "text":
                             ans += "\n" + b.get("text", "").lower()
     checks["after /clear the model states the rule"] = "banana" in ans
-    checks["after /clear the model paged line 150 back with ctx get"] = "150" in ans
     probe_calls = []
     if probe_tr:
         for e in parse_transcript(probe_tr).events:
@@ -116,8 +115,9 @@ def main() -> int:
                 out = e.data.get("response") or e.data.get("error") or ""
                 probe_calls.append({"tool": e.data.get("name"), "input": e.data.get("input"),
                                     "output": out if isinstance(out, str) else out.get("stdout", out)})
-    checks["the probe called ctx get through Bash"] = any(
-        "ctx get" in json.dumps(c["input"]) and "150" in json.dumps(c["output"]) for c in probe_calls)
+    checks["after /clear the model paged the trimmed output back with ctx get"] = any(
+        "ctx get" in json.dumps(c["input"]) and "\n150\n" in "\n" + str(c["output"]) + "\n" for c in probe_calls) \
+        and "150" in ans
 
     clear_log = {}
     if thread:
