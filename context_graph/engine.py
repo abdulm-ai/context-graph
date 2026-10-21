@@ -23,7 +23,8 @@ def build_pack(atoms: list[Atom], cfg: dict[str, Any], mode: str, ctx: str = "ct
     if budget is None:
         budget = int(cfg["budget_assist"] if mode == "assist" else cfg["budget_replace"])
     reserved = packmod.header_tokens(mode, cfg.get("selector", "graph"), ctx, cpt)
-    sel = select(atoms, cfg, budget, reserved_tokens=reserved)
+    share = float(cfg["user_share_assist"] if mode == "assist" else cfg["user_share_replace"])
+    sel = select(atoms, cfg, budget, reserved_tokens=reserved, user_share=share)
     text = packmod.render(sel, atoms, mode=mode, ctx=ctx, cpt=cpt)
     # The budget is hard: if rounding left the rendered pack over it, drop the
     # least valuable chosen atom until it fits. Pins are never dropped.
@@ -57,7 +58,8 @@ def selection_record(sel: Selection, atoms: list[Atom], text: str, cfg: dict[str
         "mode": mode,
         "time": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "config": {k: cfg.get(k) for k in ("selector", "relevance", "solver", "half_life_turns",
-                                           "diffusion_time", "focus_turns", "chars_per_token")},
+                                           "diffusion_time", "focus_turns", "chars_per_token",
+                                           "user_share_replace", "user_share_assist")},
         "budget": sel.budget,
         "pack_chars": len(text),
         "pack_tokens_est": estimate(text, float(cfg["chars_per_token"])),

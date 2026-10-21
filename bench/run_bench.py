@@ -12,6 +12,7 @@ every compaction method applied to a copy of that same session:
   cg_diffusion  /clear plus the pack: heat diffusion, knapsack
   cg_greedy     /clear plus the pack: shortest path, greedy
   cg_2k         cg_dijkstra with a 2,000 token budget instead of 6,000
+  cg_no_user    cg_dijkstra without the budget share for the user's own prompts
 
 After each method: one probe call (tools off) with the twelve planted-fact
 questions, and one follow-up coding task on a reset repository that a
@@ -66,6 +67,8 @@ METHODS: dict[str, dict] = {
     "cg_greedy": {"kind": "clear", "env": {"CONTEXT_GRAPH_RELEVANCE": "dijkstra", "CONTEXT_GRAPH_SOLVER": "greedy"}},
     "cg_2k": {"kind": "clear", "budget": 2000,
               "env": {"CONTEXT_GRAPH_RELEVANCE": "dijkstra", "CONTEXT_GRAPH_SOLVER": "knapsack"}},
+    "cg_no_user": {"kind": "clear", "env": {"CONTEXT_GRAPH_RELEVANCE": "dijkstra", "CONTEXT_GRAPH_SOLVER": "knapsack",
+                                            "CONTEXT_GRAPH_USER_SHARE_REPLACE": "0"}},
 }
 METHODS_A = list(METHODS)
 METHODS_B = ["full", "native", "cg_dijkstra"]

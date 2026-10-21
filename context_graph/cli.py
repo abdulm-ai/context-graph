@@ -75,7 +75,8 @@ def cmd_show(args: argparse.Namespace) -> int:
 
     kept = sorted(sel.kept, key=lambda i: (not sel.scores[i].get("pinned"), -float(sel.scores[i].get("value", 0) or 0)))
     for aid in kept:
-        print(line(aid, "PIN" if sel.scores[aid].get("pinned") else "+"))
+        mark = "PIN" if sel.scores[aid].get("pinned") else "U" if sel.scores[aid].get("reason") == "user prompt" else "+"
+        print(line(aid, mark))
     dropped = sorted(sel.dropped, key=lambda i: -float(sel.scores[i].get("value", 0) or 0))
     shown = dropped if args.all else dropped[:10]
     if shown:
@@ -130,6 +131,8 @@ def cmd_explain(args: argparse.Namespace) -> int:
     print()
     if s.get("pinned"):
         print("decision: KEPT (pinned: always carried over, verbatim)")
+    elif s.get("reason") == "user prompt":
+        print("decision: KEPT as one of the user's own prompts (newest first, within their share of the budget)")
     elif a.id in sel.kept:
         print(f"decision: KEPT by the {sel.solver} solver")
     else:

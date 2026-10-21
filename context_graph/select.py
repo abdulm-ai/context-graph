@@ -50,7 +50,10 @@ def relevance_scores(g: Graph, sources: dict[str, float], cfg: dict[str, Any]) -
     return shortest_path_relevance(g, sources)
 
 
-def select(atoms: list[Atom], cfg: dict[str, Any], budget: int, reserved_tokens: int = 0) -> Selection:
+def select(atoms: list[Atom], cfg: dict[str, Any], budget: int, reserved_tokens: int = 0,
+           user_share: float = 0.0) -> Selection:
+    """Pins first, then the user's own prompts (newest first, up to user_share of
+    the budget), then the solver fills what is left by relevance x decay."""
     if cfg.get("selector") == "recency":
         return select_recency(atoms, cfg, budget, reserved_tokens)
     t0 = time.perf_counter()
@@ -68,6 +71,20 @@ def select(atoms: list[Atom], cfg: dict[str, Any], budget: int, reserved_tokens:
     pinned_tokens = sum(a.tokens for a in must)
     capacity = max(0, budget - reserved_tokens - pinned_tokens)
 
+    # The user's own words are the densest record of intent, and the native
+    # compaction prompt also asks for every user message. Keep them verbatim,
+    # newest first, within their share of the budget.
+    user_kept: list[Atom] = []
+    user_cap = min(capacity, int(budget * max(0.0, user_share)))
+    used = 0
+    for a in sorted((a for a in atoms if a.kind == "turn" and a.id not in must_ids), key=lambda a: -a.turn):
+        if used + a.tokens > user_cap:
+            break
+        user_kept.append(a)
+        used += a.tokens
+    user_ids = {a.id for a in user_kept}
+    capacity -= used
+
     scores: dict[str, dict[str, Any]] = {}
     items: list[bud.Item] = []
     for a in atoms:
@@ -81,8 +98,9 @@ def select(atoms: list[Atom], cfg: dict[str, Any], budget: int, reserved_tokens:
             "decay": round(d, 6),
             "value": round(v, 6),
             "pinned": a.id in must_ids,
+            "reason": "pinned" if a.id in must_ids else "user prompt" if a.id in user_ids else "",
         }
-        if a.id not in must_ids and v > MIN_VALUE:
+        if a.id not in must_ids and a.id not in user_ids and v > MIN_VALUE:
             items.append(bud.Item(a.id, v, a.tokens))
 
     bucket = int(cfg.get("bucket_tokens", 10))
@@ -90,7 +108,9 @@ def select(atoms: list[Atom], cfg: dict[str, Any], budget: int, reserved_tokens:
     chosen = (bud.greedy if solver == "greedy" else bud.knapsack)(items, capacity, bucket)
     t3 = time.perf_counter()
 
-    chosen_set = set(chosen)
+    for aid in chosen:
+        scores[aid]["reason"] = solver
+    chosen_set = set(chosen) | user_ids
     kept = [a.id for a in atoms if a.id in must_ids or a.id in chosen_set]
     dropped = [a.id for a in atoms if a.id not in must_ids and a.id not in chosen_set]
     return Selection(

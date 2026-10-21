@@ -20,6 +20,8 @@ DEFAULTS: dict[str, Any] = {
     "selector": "graph",  # graph | recency (the recency-truncation baseline)
     "budget_replace": 6000,  # tokens carried over after /clear
     "budget_assist": 2000,  # tokens added on top of the /compact summary
+    "user_share_replace": 0.35,  # share of the budget kept for the user's own prompts after /clear
+    "user_share_assist": 0.0,  # the /compact summary already lists the user's messages
     "inject_on_clear": True,
     "inject_on_compact": True,
     "half_life_turns": 8.0,

@@ -133,6 +133,15 @@ class SelectionTest(unittest.TestCase):
         self.assertIn("u3", sel.kept)
         self.assertNotIn("u1", sel.kept)
 
+    def test_user_prompts_share(self):
+        _, sel = build_pack(self.atoms, self.cfg, "replace", budget=6000)
+        self.assertEqual(sel.scores["u1"]["reason"], "user prompt")
+        cfg = dict(self.cfg, user_share_replace=0.0)
+        _, sel0 = build_pack(self.atoms, cfg, "replace", budget=6000)
+        self.assertNotEqual(sel0.scores["u1"]["reason"], "user prompt")
+        _, sela = build_pack(self.atoms, self.cfg, "assist", budget=6000)
+        self.assertNotEqual(sela.scores["u1"]["reason"], "user prompt")
+
     def test_greedy_switch(self):
         cfg = dict(self.cfg, solver="greedy")
         _, sel = build_pack(self.atoms, cfg, "replace", budget=400)
