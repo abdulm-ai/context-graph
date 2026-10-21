@@ -53,12 +53,12 @@ class HookFlowTest(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def fire(self, payload):
+    def fire(self, payload, argv=None):
         payload.setdefault("cwd", self.cwd)
         payload.setdefault("session_id", "s1")
         payload.setdefault("transcript_path", "/nonexistent.jsonl")
         out = io.StringIO()
-        self.assertEqual(hooks.main(io.StringIO(json.dumps(payload)), out, self.env), 0)
+        self.assertEqual(hooks.main(io.StringIO(json.dumps(payload)), out, self.env, argv=argv or []), 0)
         return json.loads(out.getvalue()) if out.getvalue() else None
 
     def ctx(self, *args):
@@ -126,6 +126,28 @@ class HookFlowTest(unittest.TestCase):
         self.assertEqual(st.lookup(self.cwd, "s2").id, st.lookup(self.cwd, "s1").id)
         self.assertEqual(st.lookup(self.cwd, "s2").meta()["turn"], 2)
 
+    def test_large_pack_is_sent_in_parts(self):
+        self.fire({"hook_event_name": "SessionStart", "source": "startup"})
+        for i in range(1, 41):
+            self.fire({"hook_event_name": "UserPromptSubmit",
+                       "prompt": f"Step {i}: update module_{i}.py and explain the change in detail. " + "x" * 300})
+            self.fire({"hook_event_name": "Stop", "last_assistant_message": f"Updated module_{i}.py. " + "y" * 500})
+        self.fire({"hook_event_name": "SessionEnd", "reason": "clear"})
+        start = {"hook_event_name": "SessionStart", "source": "clear", "session_id": "s2"}
+        parts = [self.fire(dict(start), argv=["--part", str(k)]) for k in (2, 3, 4)]
+        first = self.fire(dict(start))
+        texts = [first["hookSpecificOutput"]["additionalContext"]] + [
+            p["hookSpecificOutput"]["additionalContext"] for p in parts if p]
+        self.assertGreater(len(texts), 1)
+        self.assertTrue(all(len(t) <= 9000 for t in texts))
+        self.assertTrue(all(t.startswith(f"[context-graph pack, part {k} of {len(texts)}.") for k, t in enumerate(texts, 1)))
+        t = Store(self.tmp.name).lookup(self.cwd, "s2")
+        self.assertEqual(len(t.selections()), 1)  # only part 1 writes the log
+        with open(t.selections()[0], encoding="utf-8") as fh:
+            whole = json.load(fh)["pack"]
+        body = "\n".join(x.split("\n", 1)[1] for x in texts)
+        self.assertEqual(body, whole)
+
     def test_unknown_session_backfills_from_transcript(self):
         self.fire({"hook_event_name": "UserPromptSubmit", "prompt": "Now add a refund() function.",
                    "session_id": "fork-1", "transcript_path": FIX, "cwd": "/work/ledger"})
@@ -136,9 +158,9 @@ class HookFlowTest(unittest.TestCase):
 
     def test_disabled_and_garbage_input(self):
         out = io.StringIO()
-        self.assertEqual(hooks.main(io.StringIO("not json"), out, self.env), 0)
+        self.assertEqual(hooks.main(io.StringIO("not json"), out, self.env, argv=[]), 0)
         env = dict(self.env, CONTEXT_GRAPH_DISABLE="1")
-        self.assertEqual(hooks.main(io.StringIO("{}"), out, env), 0)
+        self.assertEqual(hooks.main(io.StringIO("{}"), out, env, argv=[]), 0)
         self.assertEqual(out.getvalue(), "")
 
     def test_errors_are_logged_not_raised(self):
@@ -148,7 +170,7 @@ class HookFlowTest(unittest.TestCase):
         # make the projects path a file so the store cannot be created
         with open(os.path.join(self.tmp.name, "projects"), "w") as fh:
             fh.write("x")
-        self.assertEqual(hooks.main(io.StringIO(json.dumps(bad)), out, self.env), 0)
+        self.assertEqual(hooks.main(io.StringIO(json.dumps(bad)), out, self.env, argv=[]), 0)
         self.assertEqual(out.getvalue(), "")
         self.assertTrue(os.path.exists(os.path.join(self.tmp.name, "errors.log")))
 

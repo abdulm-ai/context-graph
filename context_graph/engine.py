@@ -27,9 +27,11 @@ def build_pack(atoms: list[Atom], cfg: dict[str, Any], mode: str, ctx: str = "ct
     sel = select(atoms, cfg, budget, reserved_tokens=reserved, user_share=share)
     text = packmod.render(sel, atoms, mode=mode, ctx=ctx, cpt=cpt)
     # The budget is hard: if rounding left the rendered pack over it, drop the
-    # least valuable chosen atom until it fits. Pins are never dropped.
+    # least valuable chosen atom until it fits. Pins are never dropped. The pack
+    # must also fit in the hook outputs that carry it (see pack.split_parts).
+    max_chars = packmod.max_pack_chars(cfg)
     pinned = set(sel.pinned)
-    while estimate(text, cpt) > budget:
+    while estimate(text, cpt) > budget or len(text) > max_chars:
         chosen = [i for i in sel.kept if i not in pinned]
         if not chosen:
             sel.overflow = True

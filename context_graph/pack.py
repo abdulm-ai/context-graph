@@ -25,6 +25,13 @@ RECENCY_HEADER = (
 )
 
 
+def max_pack_chars(cfg: dict) -> int:
+    part = int(cfg.get("pack_part_chars", 9000))
+    room = part - len(PART_MARK.format(k=99, n=99)) - 1
+    # each split can waste up to one line's worth of room; keep a margin per part
+    return max(room, int(cfg.get("pack_parts", 4)) * (room - 400))
+
+
 def header_for(mode: str, selector: str, ctx: str, kept: int = 999, total: int = 9999, tokens: int = 99999) -> str:
     if selector == "recency":
         return RECENCY_HEADER.format(tokens=tokens)
@@ -69,3 +76,37 @@ def render(sel: Selection, atoms: list[Atom], mode: str = "replace", ctx: str = 
     tokens = estimate(text_body, cpt)
     head = header_for(mode, sel.selector, ctx, kept=len(kept), total=sel.n_atoms, tokens=tokens)
     return head + "\n\n" + text_body + "\n"
+
+
+PART_MARK = "[context-graph pack, part {k} of {n}. Parts can arrive in any order; together they are one pack.]"
+
+
+def split_parts(text: str, max_chars: int) -> list[str]:
+    """Split a pack on line boundaries into parts of at most max_chars each.
+
+    Claude Code moves a hook's additionalContext larger than 10 KB to a file and
+    shows the model only a 2 KB preview, so a large pack is sent as several
+    hook outputs. Each part is labelled because their order is not guaranteed.
+    """
+    room = max_chars - len(PART_MARK.format(k=99, n=99)) - 1
+    if len(text) <= max_chars:
+        return [text]
+    chunks: list[str] = []
+    cur: list[str] = []
+    size = 0
+    for line in text.split("\n"):
+        while len(line) > room:  # a single very long line: hard split
+            if cur:
+                chunks.append("\n".join(cur))
+                cur, size = [], 0
+            chunks.append(line[:room])
+            line = line[room:]
+        if size + len(line) + 1 > room and cur:
+            chunks.append("\n".join(cur))
+            cur, size = [], 0
+        cur.append(line)
+        size += len(line) + 1
+    if cur:
+        chunks.append("\n".join(cur))
+    n = len(chunks)
+    return [PART_MARK.format(k=i, n=n) + "\n" + c for i, c in enumerate(chunks, 1)]

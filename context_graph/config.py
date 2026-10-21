@@ -27,6 +27,8 @@ DEFAULTS: dict[str, Any] = {
     "half_life_turns": 8.0,
     "diffusion_time": 2.0,
     "focus_turns": 2,
+    "pack_part_chars": 9000,  # Claude Code shows a hook's additionalContext whole only up to 10 KB
+    "pack_parts": 4,  # number of SessionStart hook commands in hooks/hooks.json
     "chars_per_token": 2.2,  # measured on claude-haiku-5-5, see tokens.py
     "bucket_tokens": 10,
     "trim": {

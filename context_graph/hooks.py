@@ -28,10 +28,11 @@ import traceback
 from typing import Any, TextIO
 
 from . import config as cfgmod
-from .engine import select_and_log
+from .engine import build_pack, select_and_log, thread_atoms
 from .events import PROMPT, REPLY, TOOL
 from .store import Store, Thread
 from .transcript import parse_transcript
+from .pack import split_parts
 from .trim import trim_response
 
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -85,6 +86,46 @@ def resolve_thread(store: Store, p: dict[str, Any]) -> Thread:
     return t
 
 
+def _pack_mode(p: dict[str, Any], cfg: dict[str, Any]) -> str | None:
+    source = p.get("source")
+    if source == "clear" and cfg["inject_on_clear"]:
+        return "replace"
+    if source == "compact" and cfg["inject_on_compact"]:
+        return "assist"
+    return None
+
+
+def _part_output(text: str, part: int, cfg: dict[str, Any]) -> dict[str, Any] | None:
+    parts = split_parts(text, int(cfg["pack_part_chars"]))
+    if part > len(parts):
+        return None
+    return {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": parts[part - 1]}}
+
+
+def handle_extra_part(p: dict[str, Any], env: dict[str, str], part: int) -> dict[str, Any] | None:
+    """SessionStart parts 2..n: rebuild the same pack read-only and return one part.
+
+    Hook commands for one event run in parallel, so these must not write: part 1
+    maps the session, writes the selection log and returns the first part. The
+    selection is deterministic, so every part sees the same pack.
+    """
+    if p.get("hook_event_name") != "SessionStart":
+        return None
+    cwd = p.get("cwd") or os.getcwd()
+    store = Store(env.get("CONTEXT_GRAPH_HOME") or None)
+    cfg = cfgmod.load(store.home, cwd, env)
+    mode = _pack_mode(p, cfg)
+    if mode is None:
+        return None
+    thread = store.lookup(cwd, p.get("session_id", ""))
+    if thread is None and p.get("source") == "clear":
+        thread = store.thread_after_clear(cwd)
+    if thread is None or not thread.events():
+        return None
+    text, _ = build_pack(thread_atoms(thread, cfg), cfg, mode, ctx=ctx_command(env))
+    return _part_output(text, part, cfg)
+
+
 def handle(p: dict[str, Any], env: dict[str, str]) -> dict[str, Any] | None:
     event = p.get("hook_event_name", "")
     cwd = p.get("cwd") or os.getcwd()
@@ -99,17 +140,11 @@ def handle(p: dict[str, Any], env: dict[str, str]) -> dict[str, Any] | None:
     thread = resolve_thread(store, p)
 
     if event == "SessionStart":
-        source = p.get("source")
-        if source == "clear" and cfg["inject_on_clear"]:
-            mode = "replace"
-        elif source == "compact" and cfg["inject_on_compact"]:
-            mode = "assist"
-        else:
+        mode = _pack_mode(p, cfg)
+        if mode is None or not thread.events():
             return None
-        if not thread.events():
-            return None
-        text, _ = select_and_log(thread, cfg, mode, trigger=str(source), ctx=ctx_command(env))
-        return {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": text}}
+        text, _ = select_and_log(thread, cfg, mode, trigger=str(p.get("source")), ctx=ctx_command(env))
+        return _part_output(text, 1, cfg)
 
     if event == "UserPromptSubmit":
         thread.append(PROMPT, {"text": str(p.get("prompt", ""))}, sid, new_turn=True)
@@ -149,8 +184,11 @@ def handle(p: dict[str, Any], env: dict[str, str]) -> dict[str, Any] | None:
     return None
 
 
-def main(stdin: TextIO = sys.stdin, stdout: TextIO = sys.stdout, env: dict[str, str] | None = None) -> int:
+def main(stdin: TextIO = sys.stdin, stdout: TextIO = sys.stdout, env: dict[str, str] | None = None,
+         argv: list[str] | None = None) -> int:
     env = dict(os.environ) if env is None else env
+    argv = sys.argv[1:] if argv is None else argv
+    part = int(argv[argv.index("--part") + 1]) if "--part" in argv else 1
     if env.get("CONTEXT_GRAPH_DISABLE", "").lower() in ("1", "true", "yes"):
         return 0
     try:
@@ -158,7 +196,7 @@ def main(stdin: TextIO = sys.stdin, stdout: TextIO = sys.stdout, env: dict[str, 
     except ValueError:
         return 0
     try:
-        out = handle(payload, env)
+        out = handle(payload, env) if part == 1 else handle_extra_part(payload, env, part)
     except Exception:  # never break the user's session
         try:
             home = Store(env.get("CONTEXT_GRAPH_HOME") or None).home
