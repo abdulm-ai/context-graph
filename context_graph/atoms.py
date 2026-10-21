@@ -85,6 +85,13 @@ _DECISION_ASSISTANT = re.compile(
     r"(?:doesn'?t|does not|didn'?t|did not|won'?t) work|reverted|abandoned)\b",
     re.I,
 )
+_TASK_START = re.compile(
+    r"^(?:please|now|then|next|also|ok|okay|so|can you|could you|would you|let me|i want|i'd like|add|run|show|"
+    r"implement|fix|write|make|look|print|list|create|refactor|review|grep|search|find|update|remove|delete|"
+    r"rename|move|check|test|build|install|explain|summari[sz]e|tell|give|read|open|change|set up|go)\b",
+    re.I,
+)
+_MAX_CONTINUATION = 2
 _STRONG_DECISION = re.compile(r"\b(?:root cause|decided|decision|rejected|ruled out)\b", re.I)
 _MAX_ASSISTANT_DECISIONS = 3
 _MAX_TURN_CHARS = 1500  # longer prompts (pasted logs) are clipped in the pack, kept whole in the graph
@@ -324,7 +331,7 @@ def _tool_atoms(ev: Event, cwd: str) -> list[Atom]:
 # ---------------------------------------------------------------- main entry
 
 
-def extract_atoms(events: Iterable[Event], cwd: str = "", chars_per_token: float = 3.5) -> list[Atom]:
+def extract_atoms(events: Iterable[Event], cwd: str = "", chars_per_token: float = 2.2) -> list[Atom]:
     atoms: list[Atom] = []
     for ev in events:
         if ev.kind == PROMPT:
@@ -336,17 +343,27 @@ def extract_atoms(events: Iterable[Event], cwd: str = "", chars_per_token: float
                      files=[_norm_path(p, cwd) for p in find_paths(text)], symbols=find_symbols(text))
             atoms.append(u)
             n_k = n_d = 0
-            for s in split_sentences(text):
-                if is_constraint(s):
+            sents = split_sentences(text)
+            for i, s in enumerate(sents):
+                kind = ("constraint" if is_constraint(s) else
+                        "decision" if _DECISION_USER.search(s) and not s.endswith("?") else None)
+                if kind is None:
+                    continue
+                # A rule is often explained in the next sentence ("Amounts are integer
+                # cents end to end."). Keep that with it, up to the next rule or task.
+                for nxt in sents[i + 1: i + 1 + _MAX_CONTINUATION]:
+                    if is_constraint(nxt) or _DECISION_USER.search(nxt) or _TASK_START.search(nxt) or nxt.endswith("?"):
+                        break
+                    s = f"{s} {nxt}"
+                if kind == "constraint":
                     n_k += 1
-                    atoms.append(Atom(f"k{ev.turn}.{n_k}", "constraint", ev.turn, ev.seq, s, s, "user",
-                                      files=[_norm_path(p, cwd) for p in find_paths(s)],
-                                      symbols=find_symbols(s), pinned=True, parent=u.id))
-                elif _DECISION_USER.search(s) and not s.endswith("?"):
+                    aid = f"k{ev.turn}.{n_k}"
+                else:
                     n_d += 1
-                    atoms.append(Atom(f"d{ev.turn}.{n_d}", "decision", ev.turn, ev.seq, s, s, "user",
-                                      files=[_norm_path(p, cwd) for p in find_paths(s)],
-                                      symbols=find_symbols(s), pinned=True, parent=u.id))
+                    aid = f"d{ev.turn}.{n_d}"
+                atoms.append(Atom(aid, kind, ev.turn, ev.seq, s, s, "user",
+                                  files=[_norm_path(p, cwd) for p in find_paths(s)],
+                                  symbols=find_symbols(s), pinned=True, parent=u.id))
         elif ev.kind == REPLY:
             text = str(ev.data.get("text", ""))
             r = Atom(f"r{ev.turn}", "reply", ev.turn, ev.seq, text, "assistant: " + _clip(text, 600), "assistant",
@@ -362,7 +379,7 @@ def extract_atoms(events: Iterable[Event], cwd: str = "", chars_per_token: float
             atoms.extend(_tool_atoms(ev, cwd))
 
     _resolve_paths(atoms)
-    atoms.extend(_file_atoms(atoms))
+    atoms.extend(_file_atoms(atoms, cwd))
     _dedupe_pins(atoms)
     for a in atoms:
         a.last_used = a.turn
@@ -388,18 +405,23 @@ def _resolve_paths(atoms: list[Atom]) -> None:
         a.files = out
 
 
-def _file_atoms(atoms: list[Atom]) -> list[Atom]:
+def _file_atoms(atoms: list[Atom], cwd: str = "") -> list[Atom]:
     uses: dict[str, list[tuple[int, str, int]]] = {}
+    direct: set[str] = set()  # paths given to a file tool (Read, Edit, Write, ...)
     for a in atoms:
         if a.kind == "file":
             continue
         for p in a.files:
             uses.setdefault(p, []).append((a.turn, a.kind, a.seq))
+        if a.kind in ("edit", "lookup") and a.files:
+            direct.add(a.files[0])
     out = []
     for path, us in uses.items():
         touched = [u for u in us if u[1] in ("edit", "command", "lookup", "error")]
         if not touched:
             continue  # only mentioned in prose, never touched: not a file atom
+        if path not in direct and cwd and not os.path.exists(os.path.join(cwd, path)):
+            continue  # named in a shell command but not there (`cat setup.py 2>/dev/null`)
         parts = []
         for kind, label in (("edit", "edited"), ("lookup", "read"), ("command", "used in commands"), ("error", "in errors")):
             turns = sorted({u[0] for u in us if u[1] == kind})

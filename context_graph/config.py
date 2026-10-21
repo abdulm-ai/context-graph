@@ -25,7 +25,7 @@ DEFAULTS: dict[str, Any] = {
     "half_life_turns": 8.0,
     "diffusion_time": 2.0,
     "focus_turns": 2,
-    "chars_per_token": 3.5,
+    "chars_per_token": 2.2,  # measured on claude-haiku-5-5, see tokens.py
     "bucket_tokens": 10,
     "trim": {
         "enabled": True,

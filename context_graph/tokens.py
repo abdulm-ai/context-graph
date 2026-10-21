@@ -1,17 +1,17 @@
 """Token estimate used for the budget.
 
 The plugin is standard library only, so it cannot run the model's tokenizer.
-It estimates tokens from characters. The default ratio is deliberately on the
-low side (more tokens per character than plain English) because session text
-is code, paths and command output. The benchmark measures the real number of
-carried-over tokens from API usage and reports the estimate's error.
+It estimates tokens from characters. The default ratio, 2.2 characters per
+token, was measured with API usage counts on claude-haiku-5-5 for a rendered
+pack (2.21), Python source (2.37) and English prose (2.10); see
+results/README.md. Set chars_per_token in the config for another model.
 """
 
 from __future__ import annotations
 
 import math
 
-DEFAULT_CHARS_PER_TOKEN = 3.5
+DEFAULT_CHARS_PER_TOKEN = 2.2
 
 
 def estimate(text: str, chars_per_token: float = DEFAULT_CHARS_PER_TOKEN) -> int:

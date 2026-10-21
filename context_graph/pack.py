@@ -42,7 +42,7 @@ def _line(a: Atom, with_source: bool = False) -> str:
     return f"- [{a.id}] ({where}) {a.render}"
 
 
-def render(sel: Selection, atoms: list[Atom], mode: str = "replace", ctx: str = "ctx", cpt: float = 3.5) -> str:
+def render(sel: Selection, atoms: list[Atom], mode: str = "replace", ctx: str = "ctx", cpt: float = 2.2) -> str:
     by_id = {a.id: a for a in atoms}
     kept = [by_id[i] for i in sel.kept if i in by_id]
     kept.sort(key=lambda a: (a.seq, a.id))

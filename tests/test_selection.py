@@ -117,7 +117,7 @@ class SelectionTest(unittest.TestCase):
         self.assertTrue(sel.overflow)
 
     def test_pack_fits_budget(self):
-        for b in (400, 800, 6000):
+        for b in (700, 1200, 6000):
             text, sel = build_pack(self.atoms, self.cfg, "replace", budget=b)
             self.assertLessEqual(estimate(text), b)
             self.assertFalse(sel.overflow)
