@@ -1,6 +1,6 @@
 # context-graph
 
-A Claude Code plugin that records a session as a graph while you work and, after `/compact` or `/clear`, rebuilds the context by calculation (shortest paths or heat diffusion, decay, a knapsack token budget) instead of relying on one model-written summary.
+A [Claude Code](https://code.claude.com) plugin that records a session as a graph while you work and, after `/compact` or `/clear`, rebuilds the context by calculation (shortest paths or heat diffusion, decay, a knapsack token budget) instead of relying on one model-written summary.
 
 The two goals, in order: lose nothing that matters, then spend fewer tokens. A method that saves tokens by forgetting things loses.
 
@@ -205,7 +205,7 @@ These graph rows use the first extractor (v1), which pinned rules and decisions 
 ### Where `/compact` still leads
 
 * **Recall on the main scenario:** `/compact` recalled 12 of 12 in all three main runs, against 11 of 12 for the v1 graph pack.
-* **Tokens on the next task:** after the pack, the follow-up task used 943,321 input tokens on average against 491,490 after `/compact` (both well under the 1,162,041 with no compaction). The model made more calls and re-read code, because the native summary includes a "Files and Code Sections" part describing the code's current state, which the pack does not yet carry. This is the next thing to add.
+* **Tokens on the next task:** after the pack, the follow-up task used 943,321 input tokens on average against 491,490 after `/compact` (both well under the 1,162,041 with no compaction). The model made more calls and re-read code, because the native summary includes a "Files and Code Sections" part describing the code's current state, which the pack does not carry.
 
 ### Other findings
 
@@ -235,7 +235,7 @@ The pack is rebuilt from each recorded session and checked for every planted sen
 | **v2 (current)** | main | **100%** | **100%** | **100%** | **100%** |
 | **v2 (current)** | held-out | **100%** | **100%** | **100%** | **100%** |
 
-With the current extractor, **all twelve statements are in the pack, word for word, at every budget from 2,000 tokens up, in all six sessions**, including the held-out wording the rules were not written from. They cost about 1,000 tokens of pins. Recency truncation at 6,000 tokens contains 25% (main) and 31% (held-out). Live probe runs with v2 are the next measurement; the commands are in [`results/README.md`](results/README.md).
+With the current extractor, **all twelve statements are in the pack, word for word, at every budget from 2,000 tokens up, in all six sessions**, including the held-out wording the rules were not written from. They cost about 1,000 tokens of pins. Recency truncation at 6,000 tokens contains 25% (main) and 31% (held-out). The commands for live probe runs with v2 are in [`results/README.md`](results/README.md).
 
 ### End-to-end check
 
@@ -311,6 +311,10 @@ The graph lives under `~/.context-graph` (or `$CONTEXT_GRAPH_HOME`) and never le
 * Gutiérrez, B. J., Shu, Y., Gu, Y., Yasunaga, M., and Su, Y. (2024). HippoRAG: Neurobiologically Inspired Long-Term Memory for Large Language Models. *NeurIPS 2024.* https://arxiv.org/abs/2405.14831
 * Chung, F. (2007). The heat kernel as the pagerank of a graph. *PNAS* 104(50), 19735-19740. https://doi.org/10.1073/pnas.0708838104
 * Dijkstra, E. W. (1959). A note on two problems in connexion with graphs. *Numerische Mathematik* 1, 269-271. https://doi.org/10.1007/BF01386390
+
+## Author
+
+Abdul M. ([GitHub](https://github.com/abdulm-ai), [LinkedIn](https://www.linkedin.com/in/abdulm-ai), [Medium](https://medium.com/@abdul-m)). The ideas it builds on belong to the authors in the references above.
 
 ## License
 
