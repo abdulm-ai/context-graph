@@ -230,7 +230,7 @@ def _exit_status(data: dict[str, Any]) -> tuple[int | str, str]:
 def _edit_text(name: str, inp: dict[str, Any]) -> tuple[str, int, int]:
     if name == "Write":
         content = str(inp.get("content", ""))
-        return content, 0, content.count("\n") + 1
+        return content, 0, len(content.splitlines())
     edits = inp.get("edits") if name == "MultiEdit" else [inp]
     chunks, removed, added = [], 0, 0
     for e in edits or []:
@@ -264,7 +264,8 @@ def _tool_atoms(ev: Event, cwd: str) -> list[Atom]:
         tail = [ln for ln in out_text.strip().splitlines() if ln.strip()][-1:] if status == 0 else []
         render = f"$ {_clip(cmd, 160)} -> {status_txt}" + (f" | {_clip(tail[0], 100)}" if tail else "")
         atoms.append(
-            Atom(aid, "command", ev.turn, ev.seq, full, render, "tool", meta={"exit": status, "tool": name},
+            Atom(aid, "command", ev.turn, ev.seq, full, render, "tool",
+                 meta={"exit": status, "tool": name, "body_offset": 2},
                  symbols=find_symbols(cmd))
         )
     elif name in ("Edit", "Write", "MultiEdit", "NotebookEdit"):

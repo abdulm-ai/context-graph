@@ -149,7 +149,9 @@ def cmd_get(args: argparse.Namespace) -> int:
     a = by_id.get(args.id)
     if a is None:
         sys.exit(f"ctx: no atom {args.id}")
-    lines = a.text.splitlines()
+    # For a command, print only its output, so line numbers match the ones in a
+    # trimmed output's note. `ctx explain` shows the command and exit status.
+    lines = a.text.splitlines()[int(a.meta.get("body_offset", 0)):]
     if args.lines:
         lo, _, hi = args.lines.partition(":")
         lines = lines[int(lo or 1) - 1: int(hi) if hi else None]

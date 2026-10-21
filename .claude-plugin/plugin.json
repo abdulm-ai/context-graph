@@ -1,0 +1,13 @@
+{
+  "name": "context-graph",
+  "version": "0.1.0",
+  "description": "Saves the session as a graph while you work. After /compact or /clear it rebuilds the context by calculation: shortest paths or heat diffusion, decay, and a knapsack token budget, with your constraints and decisions pinned word for word.",
+  "author": {
+    "name": "Abdul M.",
+    "url": "https://github.com/abdulm-ai"
+  },
+  "homepage": "https://github.com/abdulm-ai/context-graph",
+  "repository": "https://github.com/abdulm-ai/context-graph",
+  "license": "MIT",
+  "keywords": ["context", "compaction", "memory", "graph", "hooks"]
+}

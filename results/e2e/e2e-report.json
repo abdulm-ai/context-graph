@@ -1,0 +1,104 @@
+{
+ "date": "2026-10-21",
+ "claude_version": "2.1.306 (Claude Code)",
+ "model_arg": "haiku",
+ "models": [
+  "claude-haiku-5-5"
+ ],
+ "probe_answer_text": "the project rule is: never put the word \"banana\" in any file in this repository.\n\nline 150 of the `seq 1 300` output, fetched with `ctx get t3`, says exactly: `150`\nthe project rule from the carried-over context is: never put the word \"banana\" in any file in this repository. next i'll fetch the seq output through `ctx`. the stored `seq` result is item `t3`.\nthe project rule is: never put the word \"banana\" in any file in this repository.\n\nline 150 of the `seq 1 300` output, fetched with `ctx get t3`, says exactly: `150`",
+ "steps": [
+  {
+   "step": "turn1",
+   "prompt": "Project rule: never put the word banana in any file in this repository. Create notes.txt containing the single line alpha. Then run `seq 1 300` with Bash and tell me the last number it printed.",
+   "ok": true,
+   "result": "The last number `seq 1 300` printed is **300**.\n\nI created `notes.txt` containing the single line `alpha`. It doesn't contain the word banana.\n\nThe Bash output I received was partly elided: lines 26\u2013275 were replaced with a note pointing to a `ctx get` command. I didn't run that command, since the last line (300) was visible and answers your question.",
+   "session_id": "a4486a43-e2a3-4eac-877c-25d5449671c7",
+   "input_tokens": 16176,
+   "output_tokens": 568,
+   "cost_usd": 0.00083022,
+   "wall_s": 6.4,
+   "error": ""
+  },
+  {
+   "step": "turn2",
+   "prompt": "Run `python3 -c \"import nothing_here\"` with Bash and tell me the error in one line.",
+   "ok": true,
+   "result": "`ModuleNotFoundError: No module named 'nothing_here'`",
+   "session_id": "a4486a43-e2a3-4eac-877c-25d5449671c7",
+   "input_tokens": 17832,
+   "output_tokens": 120,
+   "cost_usd": 0.00114871,
+   "wall_s": 4.94,
+   "error": ""
+  },
+  {
+   "step": "compact",
+   "prompt": "/compact",
+   "ok": true,
+   "result": "",
+   "session_id": "a4486a43-e2a3-4eac-877c-25d5449671c7",
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "cost_usd": 0.00221442,
+   "wall_s": 8.99,
+   "error": ""
+  },
+  {
+   "step": "clear",
+   "prompt": "/clear",
+   "ok": true,
+   "result": "",
+   "session_id": "5e61b44d-3702-485a-8a57-3aeec7f085ea",
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "cost_usd": 0.0,
+   "wall_s": 2.24,
+   "error": ""
+  },
+  {
+   "step": "probe",
+   "prompt": "Without reading any files: what is the project rule I gave you about a word? Then use the `ctx` command with Bash to fetch line 150 of the output of the seq command, and tell me exactly what that line says.",
+   "ok": true,
+   "result": "The project rule is: never put the word \"banana\" in any file in this repository.\n\nLine 150 of the `seq 1 300` output, fetched with `ctx get t3`, says exactly: `150`",
+   "session_id": "5e61b44d-3702-485a-8a57-3aeec7f085ea",
+   "input_tokens": 17895,
+   "output_tokens": 618,
+   "cost_usd": 0.000728315,
+   "wall_s": 6.37,
+   "error": ""
+  }
+ ],
+ "total_cost_usd": 0.0049,
+ "checks": {
+  "captured prompts, tools and replies": true,
+  "captured the failed command": true,
+  "seq output was trimmed in the model's context": true,
+  "/compact wrote an assist selection": true,
+  "PostCompact stored the native summary": true,
+  "/clear started a new session id": true,
+  "/clear session joined the same thread": true,
+  "/clear wrote a replace selection": true,
+  "after /clear the model states the rule": true,
+  "after /clear the model paged line 150 back with ctx get": true,
+  "the probe called ctx get through Bash": true
+ },
+ "passed": true,
+ "probe_tool_calls": [
+  {
+   "tool": "Bash",
+   "input": {
+    "command": "ctx get t3 | sed -n '150p'",
+    "description": "Fetch seq output via ctx and print line 150"
+   },
+   "output": "150"
+  }
+ ],
+ "clear_pack": "# Carried-over context (context-graph)\nThe conversation was cleared. This is what was kept from it: 10 of 10 items from the session graph, chosen by relevance to the latest request and by recency, about 393 tokens. Items under PINNED are the user's constraints and the decisions already made, copied word for word: follow them. To read the full text of any item, run `ctx get <id>` with Bash.\n\n## PINNED: constraints and decisions (verbatim)\n- [k1.1] (turn 1, user) Project rule: never put the word banana in any file in this repository.\n## Session record (most relevant items, oldest first)\n- [f:notes.txt] (turn 1) file notes.txt: edited (turns 1)\n- [u1] (turn 1) user: \"Project rule: never put the word banana in any file in this repository. Create notes.txt containing the single line alpha. Then run `seq 1 300` with Bash and tell me the last number it printed.\"\n- [t2] (turn 1) wrote notes.txt (-0 +1 lines)\n- [t3] (turn 1) $ seq 1 300 -> exit 0 | 300\n- [r1] (turn 1) assistant: The last number `seq 1 300` printed is **300**. I created `notes.txt` containing the single line `alpha`. It doesn't contain the word banana. The Bash output I received was partly elided: lines 26\u2013275 were replaced with a note pointing to a `ctx get` command. I didn't run that command, since the last line (300) was visible and answers your question.\n- [e6] (turn 2) error in $ python3 -c \"import nothing_here\": Exit code 1 / Traceback (most recent call last): / ModuleNotFoundError: No module named 'nothing_here'\n- [t6] (turn 2) $ python3 -c \"import nothing_here\" -> exit 1\n- [r2] (turn 2) assistant: `ModuleNotFoundError: No module named 'nothing_here'`\n## Latest request\n- [u2] (turn 2) user: \"Run `python3 -c \"import nothing_here\"` with Bash and tell me the error in one line.\"\n",
+ "clear_selection": {
+  "budget": 6000,
+  "pack_tokens_est": 506,
+  "n_atoms": 10,
+  "n_edges": 13,
+  "elapsed_ms": 2.41
+ }
+}

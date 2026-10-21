@@ -1,0 +1,14 @@
+{
+  "name": "context-graph",
+  "owner": {
+    "name": "Abdul M.",
+    "url": "https://github.com/abdulm-ai"
+  },
+  "plugins": [
+    {
+      "name": "context-graph",
+      "source": "./",
+      "description": "Rebuild context after /compact or /clear from a session graph instead of a summary."
+    }
+  ]
+}
