@@ -106,7 +106,63 @@ WORK = {
         "now in a short list.",
 }
 
+# A held-out set: the same work turns with twelve other facts, worded differently.
+# Written before the extraction rules were revised after the first benchmark
+# round, so it checks that a fix generalises beyond the sentences it was made on.
+HOLDOUT_FACTS = [
+    Fact("F1", 2, "constraint", "How are money amounts stored in this project?",
+         [r"cent", r"float|integer|int\b|whole"]),
+    Fact("F2", 5, "fact", "Which host and port serve the staging copy of the ledger?", [r"orca-stg-2", r"5433"]),
+    Fact("F3", 8, "decision", "What did we settle on for persistence, and what went wrong with the alternative?",
+         [r"sqlite", r"lost|two processes|concurren|at once|simultan"]),
+    Fact("F4", 11, "constraint", "Which folder must be left as it is, and which group does it belong to?",
+         [r"legacy", r"payments"]),
+    Fact("F5", 14, "fact", "Who answers questions about the numbers in reports?", [r"tomasz"]),
+    Fact("F6", 17, "root_cause", "Why were entries missing from the monthly report?",
+         [r"last day|final day|31|end of the month", r"less|strict|<|skip|exclu|drop|compar"]),
+    Fact("F7", 20, "rejected", "What was tried to speed up get_balance, and why was it dropped?",
+         [r"lru_cache|memoi|cach", r"stale|outdated|old|wrong"]),
+    Fact("F8", 23, "fact", "What is the reference number for this piece of work?", [r"LEDG-0412"]),
+    Fact("F9", 26, "decision", "What is the export subcommand going to be named?", [r"export-csv"]),
+    Fact("F10", 29, "constraint", "What must be true of everything the CLI prints?", [r"csv", r"header"]),
+    Fact("F11", 32, "fact", "When does our financial year begin?", [r"april"]),
+    Fact("F12", 35, "constraint", "What is the rule about packages and dependencies?",
+         [r"standard library|stdlib|pypi|third[- ]party|no (new |external )?(packages|dependenc)"]),
+]
+
+HOLDOUT_PLANTS = {
+    2: "Heads up: amounts in this project are always stored as whole cents, never as floating point.",
+    5: "The staging copy of the ledger is served from orca-stg-2 on port 5433.",
+    8: ("After some back and forth we settled on SQLite for persistence; plain JSON files lost writes when two "
+        "processes saved at once."),
+    11: "The legacy/ folder belongs to the payments group, so leave it exactly as it is.",
+    14: "Questions about the numbers in reports go to Tomasz Wierzbicki in finance.",
+    17: ("Found it: monthly_report filters with a strict less-than against the month's final day, which silently "
+         "skips anything booked on that day."),
+    20: ("Memoizing get_balance was attempted once with lru_cache and it served outdated totals after new entries "
+         "were added, so that idea is off the table."),
+    23: "Reference number for this piece of work: LEDG-0412.",
+    26: "The export subcommand is going to be named export-csv.",
+    29: "Whatever the CLI prints has to remain CSV with a header line, because a finance script reads it.",
+    32: "FYI our financial year begins on the first of April.",
+    35: "Stick to the standard library; no packages from PyPI.",
+}
+
 N_TURNS = 36
+
+
+def use(name: str) -> None:
+    """Switch the planted facts: 'main' (default) or 'holdout'."""
+    global FACTS, PLANTS
+    if name == "holdout":
+        FACTS, PLANTS = HOLDOUT_FACTS, HOLDOUT_PLANTS
+    elif name == "main":
+        FACTS, PLANTS = _MAIN_FACTS, _MAIN_PLANTS
+    else:
+        raise ValueError(name)
+
+
+_MAIN_FACTS, _MAIN_PLANTS = FACTS, PLANTS
 
 
 def turn_prompt(turn: int) -> str:

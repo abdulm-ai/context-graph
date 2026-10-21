@@ -20,7 +20,8 @@ forgotten constraint would break. Probe and follow-up each fork the
 post-compaction session, so neither sees the other.
 
 Variant A runs the base session with tool-output trimming on, variant B with
-it off (the trimming ablation); B runs a subset of methods.
+it off (the trimming ablation); B runs a subset of methods. Variant H is A
+with the held-out set of planted facts (scenario.HOLDOUT_FACTS).
 
 Usage:
   python3 bench/run_bench.py --runs A1 A2 A3 B1 B2 B3 --parallel 3
@@ -136,7 +137,7 @@ class Run:
     def __init__(self, run_id: str, args: argparse.Namespace):
         self.id = run_id
         self.args = args
-        self.variant = run_id[0].upper()
+        self.variant = run_id[0].upper()  # A: trimming on, B: trimming off, H: held-out facts (trimming on)
         self.trim = self.variant != "B"
         self.work = os.path.join(args.work, run_id)
         self.repo = os.path.join(self.work, "repo")
@@ -294,6 +295,11 @@ def main() -> int:
     ap.add_argument("--reuse-base", action="store_true", help="reuse a finished base session of the same run id")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+    # The planted facts are module state, so one invocation runs one scenario.
+    kinds = {r[0].upper() == "H" for r in args.runs}
+    if len(kinds) > 1:
+        ap.error("run held-out (H*) runs in a separate invocation from A/B runs")
+    sc.use("holdout" if kinds == {True} else "main")
 
     if args.dry_run or not cc.have_key():
         if not args.dry_run:
@@ -307,7 +313,8 @@ def main() -> int:
         print("follow-up:\n" + sc.FOLLOWUP)
         return 0
 
-    meta = {"claude_version": cc.claude_version(), "model_arg": args.model, "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    meta = {"claude_version": cc.claude_version(), "model_arg": args.model,
+            "scenario": "holdout" if args.runs[0][0].upper() == "H" else "main", "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "runs": args.runs, "turns": args.turns, "budget_replace": BUDGET, "methods": {k: METHODS[k] for k in METHODS}}
     os.makedirs(args.out, exist_ok=True)
     runs = [Run(r, args) for r in args.runs]
