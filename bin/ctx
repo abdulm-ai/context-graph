@@ -1,0 +1,4 @@
+#!/bin/sh
+# ctx: inspect the context-graph of the current Claude Code session.
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m context_graph.cli "$@"

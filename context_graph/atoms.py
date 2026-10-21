@@ -279,7 +279,7 @@ def _tool_atoms(ev: Event, cwd: str) -> list[Atom]:
                  symbols=find_symbols(body)[:40])
         )
     elif name in ("Read", "Grep", "Glob", "LS"):
-        detail = inp.get("pattern") or inp.get("file_path") or inp.get("path") or ""
+        detail = inp.get("pattern") or (files[0] if files else "")
         n_lines = out_text.count("\n") + 1 if out_text else 0
         render = f"{name} {_clip(str(detail), 120)} ({n_lines} lines)"
         if name in ("Grep", "Glob"):

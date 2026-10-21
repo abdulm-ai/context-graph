@@ -157,11 +157,15 @@ def parse_records(records: list[dict[str, Any]]) -> Transcript:
                         continue
                     is_error = bool(block.get("is_error"))
                     response = rec.get("toolUseResult")
-                    if response is None or (is_error and isinstance(response, str)):
-                        response = block.get("content")
-                    data = {"name": use["name"], "input": use["input"], "response": response}
                     if is_error:
-                        data["error"] = tool_output_text(block.get("content"))
+                        # As in the PostToolUseFailure hook: no response, an error string.
+                        data = {"name": use["name"], "input": use["input"],
+                                "response": response if isinstance(response, dict) else None,
+                                "error": tool_output_text(block.get("content"))}
+                    else:
+                        if response is None:
+                            response = block.get("content")
+                        data = {"name": use["name"], "input": use["input"], "response": response}
                     emit(TOOL, data, rec)
             texts = [t for t in _text_blocks(content) if _is_prompt_text(t)]
             if texts:

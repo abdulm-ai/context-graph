@@ -33,7 +33,8 @@ class TranscriptTest(unittest.TestCase):
         self.assertEqual([t.data["name"] for t in tools], ["Read", "Bash", "Edit", "Bash", "Write"])
         failed = tools[1]
         self.assertIn("Exit code 1", failed.data["error"])
-        self.assertIn("AssertionError", failed.data["response"])
+        self.assertIn("AssertionError", failed.data["error"])
+        self.assertIsNone(failed.data["response"])
         ok = tools[3]
         self.assertEqual(ok.data["response"]["stdout"], "..\n2 passed in 0.02s")
         self.assertNotIn("error", ok.data)
