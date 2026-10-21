@@ -225,7 +225,8 @@ def _norm_path(p: str, cwd: str) -> str:
         except ValueError:
             return p
         if not rel.startswith(".."):
-            return rel
+            # relpath uses backslashes on Windows; keep one spelling per file
+            return rel.replace(os.sep, "/")
     if p.startswith("./"):
         return p[2:]
     return p
