@@ -1,0 +1,27 @@
+{
+ "note": "Measured during the pilot with the method in bench/token_ratio.py (sample sent as a prompt in a fresh session with tools off, minus an empty prompt). The pack sample was the cg_dijkstra pack of pilot run P1.",
+ "model_arg": "haiku",
+ "models": [
+  "claude-haiku-5-5"
+ ],
+ "samples": [
+  {
+   "sample": "english (MIT license x8)",
+   "chars": 8520,
+   "tokens": 4056,
+   "chars_per_token": 2.1
+  },
+  {
+   "sample": "python (atoms.py, first 9000 chars)",
+   "chars": 9000,
+   "tokens": 3790,
+   "chars_per_token": 2.37
+  },
+  {
+   "sample": "pack (pilot P1, cg_dijkstra)",
+   "chars": 8836,
+   "tokens": 4004,
+   "chars_per_token": 2.21
+  }
+ ]
+}

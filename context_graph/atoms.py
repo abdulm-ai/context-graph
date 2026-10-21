@@ -113,6 +113,8 @@ _ERROR_LINE = re.compile(
     r"Exit code \d+|No such file|not found|Permission denied|panic:|fatal:|"
     r"SyntaxError|Errno)"
 )
+_FAILURE_REPORT = re.compile(r"^\s*(?:Traceback \(most recent call last\)|FAILED\b|FAIL:|ERROR\b|E\s+\w+(?:Error|Exception)|"
+                             r"[\w.]*(?:Error|Exception): )")
 _STOP_SYMBOLS = frozenset(
     """self cls None True False print return import from with else elif while
     for def class pass break continue lambda yield async await assert raise
@@ -329,7 +331,12 @@ def _tool_atoms(ev: Event, cwd: str) -> list[Atom]:
     errs = error_lines(err_text or out_text) if (looks_failed or name == "Bash") else []
     if looks_failed and not errs:
         errs = [_clip(err_text or out_text or "failed", 200)]
-    if errs and (looks_failed or any("Traceback" in e or "FAILED" in e or "Error" in e for e in errs)):
+    # A command that exited 0 can still report a failure (a test runner that
+    # prints FAILED). Source code printed by `cat` mentions errors too, so for
+    # those only lines shaped like a failure report count.
+    if errs and not looks_failed:
+        errs = [e for e in errs if _FAILURE_REPORT.search(e)]
+    if errs:
         src = err_text or out_text
         err_files = [_norm_path(m.group(1), cwd) for m in _TRACEBACK_FILE.finditer(src)]
         err_files += [_norm_path(p, cwd) for p in find_paths("\n".join(errs))]

@@ -101,6 +101,15 @@ class ExtractTest(unittest.TestCase):
         self.assertIn("ledger/core.py", err.files)
         self.assertIn("AssertionError: expected 1050 got 1050.0", err.text)
 
+    def test_printed_source_is_not_an_error(self):
+        from context_graph.events import TOOL
+        src = "def f():\n    raise ValueError('bad')\nexcept KeyError as exc:\n"
+        ok = Event(1, 1, TOOL, {"name": "Bash", "input": {"command": "cat a.py"}, "response": {"stdout": src}})
+        failing = Event(2, 1, TOOL, {"name": "Bash", "input": {"command": "pytest"},
+                                     "response": {"stdout": "FAILED tests/t.py::x\nAssertionError: 1 != 2"}})
+        kinds = [a.kind for a in extract_atoms([ok, failing])]
+        self.assertEqual(kinds.count("error"), 1)
+
     def test_file_atoms_and_relative_paths(self):
         f = self.by_id["f:ledger/core.py"]
         self.assertIn("edited (turns 2)", f.render)

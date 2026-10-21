@@ -1,0 +1,330 @@
+{
+ "run": "B2",
+ "method": "cg_dijkstra",
+ "variant": "B",
+ "spec": {
+  "kind": "clear",
+  "env": {
+   "CONTEXT_GRAPH_RELEVANCE": "dijkstra",
+   "CONTEXT_GRAPH_SOLVER": "knapsack"
+  }
+ },
+ "compaction_call": {
+  "prompt": "/clear",
+  "ok": true,
+  "result": "",
+  "session_id": "5ac8ab06-7738-4021-a87e-8da52d00b396",
+  "usage": {
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "input_tokens": 0,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 0,
+   "server_tool_use": {
+    "web_search_requests": 0,
+    "web_fetch_requests": 0
+   },
+   "service_tier": "standard",
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "inference_geo": "",
+   "iterations": [],
+   "speed": "standard",
+   "fallback_credit": null
+  },
+  "cost_usd": 0.0,
+  "wall_s": 2.5,
+  "duration_ms": 658,
+  "num_turns": 0,
+  "models": [],
+  "error": "",
+  "input_tokens": 0,
+  "output_tokens": 0
+ },
+ "post_session": "5ac8ab06-7738-4021-a87e-8da52d00b396",
+ "selection": {
+  "trigger": "clear",
+  "mode": "replace",
+  "config": {
+   "selector": "graph",
+   "relevance": "dijkstra",
+   "solver": "knapsack",
+   "half_life_turns": 8.0,
+   "diffusion_time": 2.0,
+   "focus_turns": 2,
+   "chars_per_token": 2.2,
+   "user_share_replace": 0.35,
+   "user_share_assist": 0.0
+  },
+  "budget": 6000,
+  "pack_chars": 13177,
+  "pack_tokens_est": 5990,
+  "n_atoms": 219,
+  "n_edges": 964,
+  "pinned_tokens": 743,
+  "overflow": false,
+  "elapsed_ms": 70.15,
+  "timings_ms": {
+   "graph": 3.52,
+   "relevance": 3.38,
+   "solver": 6.96
+  },
+  "kept": [
+   "u2",
+   "k2.1",
+   "t8",
+   "t19",
+   "d4.a1",
+   "d4.a2",
+   "u6",
+   "u7",
+   "t33",
+   "t34",
+   "r7",
+   "u8",
+   "d8.1",
+   "t38",
+   "t39",
+   "u10",
+   "t46",
+   "t47",
+   "u11",
+   "k11.1",
+   "u12",
+   "t54",
+   "t56",
+   "u13",
+   "u14",
+   "d14.a1",
+   "u15",
+   "u16",
+   "u17",
+   "d17.1",
+   "t78",
+   "u18",
+   "k18.1",
+   "t83",
+   "u19",
+   "k19.1",
+   "t88",
+   "t89",
+   "t91",
+   "t92",
+   "u20",
+   "d20.1",
+   "k20.1",
+   "u21",
+   "t99",
+   "u22",
+   "u23",
+   "t107",
+   "t108",
+   "t109",
+   "d23.a1",
+   "u24",
+   "u25",
+   "u26",
+   "t120",
+   "t121",
+   "t122",
+   "t123",
+   "u27",
+   "t127",
+   "u28",
+   "t131",
+   "u29",
+   "k29.1",
+   "t135",
+   "t136",
+   "t137",
+   "t138",
+   "u30",
+   "t142",
+   "t143",
+   "t144",
+   "u31",
+   "u32",
+   "t151",
+   "t152",
+   "t153",
+   "t154",
+   "t155",
+   "t156",
+   "t157",
+   "t158",
+   "t159",
+   "t160",
+   "t161",
+   "t162",
+   "u33",
+   "d33.a1",
+   "u34",
+   "t170",
+   "u35",
+   "k35.1",
+   "t173",
+   "r35",
+   "u36",
+   "r36",
+   "f:tests/test_report.py",
+   "f:ledger/report.py",
+   "f:ledger/cli.py",
+   "f:ledger/jsonfile.py",
+   "f:ledger/store.py",
+   "f:tests/test_cli.py",
+   "f:scripts/gen_sample.py"
+  ]
+ },
+ "pack": "# Carried-over context (context-graph)\nThe conversation was cleared. This is what was kept from it: 103 of 219 items from the session graph, chosen by relevance to the latest request and by recency, about 5781 tokens. Items under PINNED are the user's constraints and the decisions already made, copied word for word: follow them. Each item starts with its [id]: `ctx get <id>` with Bash prints that item's full text, such as the whole output of a command.\n\n## PINNED: constraints and decisions (verbatim)\n- [k2.1] (turn 2, user) Rule for this codebase: never use float for money. Amounts are integer cents end to end.\n- [d4.a1] (turn 4, assistant) Digits are checked with `[0-9]` rather than `\\d`, so non-ASCII digits are rejected too.\n- [d4.a2] (turn 4, assistant) **Malformed input** is rejected: a bare `-`, a bare `.`, the empty string, `+5`, `1e3`, `1_000`, `--5`, `1,50`, and `1.2.3`.\n- [d8.1] (turn 8, user) The JSON-file storage idea is rejected because it corrupted data on concurrent writes.\n- [k11.1] (turn 11, user) Don't touch anything under legacy/. The payments team owns it and their CI breaks when we change it.\n- [d14.a1] (turn 14, assistant) The cause is in `ledger/report.py`.\n- [d17.1] (turn 17, user) The root cause is that monthly_report compares entry dates with < against the last day of the month, so entries dated on the last day are dropped.\n- [k18.1] (turn 18, user) Keep the tests green.\n- [k19.1] (turn 19, user) Add validation for the report month argument: it must look like YYYY-MM, otherwise exit with an error.\n- [d20.1] (turn 20, user) We tried caching get_balance with functools.lru_cache last month and it returned stale balances after add().\n- [k20.1] (turn 20, user) Do not use lru_cache or any memoization for balances.\n- [d23.a1] (turn 23, assistant) **`tests/test_cli.py`**: `MemoLengthTest` covers a 201-character memo, which is rejected and doesn't create the database file, and a 200-character memo, which is accepted.\n- [k29.1] (turn 29, user) All CLI output must stay CSV with a header row. The finance team parses it with a script.\n- [d33.a1] (turn 33, assistant) **Labels**: rejected formats such as `2026-Q5` and `2026-q1`.\n- [k35.1] (turn 35, user) Don't add third-party dependencies to this project; standard library only.\n## Session record (most relevant items, oldest first)\n- [f:tests/test_report.py] (turn 1) file tests/test_report.py: edited (turns 17, 19, 29, 32, 33); read (turns 11, 17, 29); in errors (turns 1, 3, 4, 9, 14)\n- [f:ledger/report.py] (turn 1) file ledger/report.py: edited (turns 15, 17, 18, 19, 29, 32); read (turns 11, 18, 32); used in commands (turns 24)\n- [u2] (turn 2) user: \"Rule for this codebase: never use float for money. Amounts are integer cents end to end. Add a format_cents function to ledger/money.py that renders 1050 as '10.50' and -5 as '-0.05', with tests.\"\n- [t8] (turn 2) edited ledger/money.py (-3 +10 lines): cents = int(whole or \"0\") * 100 + int(frac)\n- [f:ledger/cli.py] (turn 4) file ledger/cli.py: edited (turns 12, 19, 23, 26, 30, 32); read (turns 4, 6, 11, 30, 32, 34)\n- [t19] (turn 4) edited ledger/money.py (-2 +10 lines): \"\"\"Money helpers. Amounts are integer cents.\"\"\"\n- [f:ledger/jsonfile.py] (turn 6) file ledger/jsonfile.py: read (turns 6, 11)\n- [u6] (turn 6) user: \"Show me the full contents of ledger/cli.py and ledger/jsonfile.py.\"\n- [u7] (turn 7) user: \"Add an accounts command to the CLI that prints every account name, one per line after a header row.\"\n- [f:ledger/store.py] (turn 7) file ledger/store.py: edited (turns 10); read (turns 7, 11)\n- [t33] (turn 7) edited ledger/cli.py (-2 +3 lines): r.add_argument(\"month\")\n- [t34] (turn 7) edited ledger/cli.py (-3 +7 lines): elif args.cmd == \"report\":\n- [r7] (turn 7) assistant: I added an `accounts` subcommand to `ledger/cli.py`. It prints an `account` header row, then each account name on its own line, sorted. It uses the existing `Ledger.accounts()` method. I checked it against a temporary database with two accounts (`ACC-2` and `ACC-1`), and it printed: ``` account ACC-1 ACC-2 ``` With an empty database it prints just the header. The test suite still shows the same single failure, `test_includes_last_day`, which I haven't touched. I didn't add a CLI test for the new command because the repo has no CLI tests yet. I can add one if you want.\n- [u8] (turn 8) user: \"Decision: we'll store ledgers in SQLite through the sqlite3 module. The JSON-file storage idea is rejected because it corrupted data on concurrent writes. Implement a SQLite-backed store in ledger/sqlite_store.py with add, entries and get_balance, plus tests using an in-memory database.\"\n- [t38] (turn 8) wrote ledger/sqlite_store.py (-0 +43 lines)\n- [t39] (turn 8) wrote tests/test_sqlite_store.py (-0 +46 lines)\n- [u10] (turn 10) user: \"Write docstrings for every public function and class in ledger/store.py and ledger/sqlite_store.py.\"\n- [t46] (turn 10) edited ledger/store.py (-24 +32 lines): @dataclass\n- [t47] (turn 10) edited ledger/sqlite_store.py (-22 +29 lines): class SqliteStore:\n- [u11] (turn 11) user: \"Don't touch anything under legacy/. The payments team owns it and their CI breaks when we change it. Grep the codebase for every place that reads or writes amounts and list them with line numbers.\"\n- [u12] (turn 12) user: \"Add a --db option check: if the --db path's directory does not exist, exit with a clear error message.\"\n- [t54] (turn 12) edited ledger/cli.py (-3 +7 lines): args = p.parse_args(argv)\n- [f:tests/test_cli.py] (turn 12) file tests/test_cli.py: edited (turns 19, 23, 26, 27, 30, 32)\n- [t56] (turn 12) wrote tests/test_cli.py (-0 +31 lines)\n- [u13] (turn 13) user: \"Print every Python file under ledger/ with cat so I can review the whole package.\"\n- [u14] (turn 14) user: \"By the way, the finance contact for report questions is Priya Raman. Run the tests again and tell me the current state.\"\n- [u15] (turn 15) user: \"Add type hints to ledger/money.py and ledger/report.py.\"\n- [u16] (turn 16) user: \"Show me the report output for a small sample: add three entries for March 2026 to a temp db with the CLI and run the report command.\"\n- [u17] (turn 17) user: \"I traced the missing March entries. The root cause is that monthly_report compares entry dates with < against the last day of the month, so entries dated on the last day are dropped. Fix that bug and add a regression test for the last day of the month.\"\n- [t78] (turn 17) edited tests/test_report.py (-4 +15 lines): def test_includes_last_day(self):\n- [u18] (turn 18) user: \"Refactor ledger/report.py so filtering and formatting are separate functions. Keep the tests green.\"\n- [t83] (turn 18) edited ledger/report.py (-8 +18 lines): def filter_entries(ledger: Ledger, month: str) -> list[Entry]:\n- [u19] (turn 19) user: \"Add validation for the report month argument: it must look like YYYY-MM, otherwise exit with an error.\"\n- [t88] (turn 19) edited ledger/report.py (-10 +19 lines): import calendar\n- [t89] (turn 19) edited ledger/cli.py (-4 +9 lines): db_dir = os.path.dirname(os.path.abspath(args.db))\n- [t91] (turn 19) edited tests/test_report.py (-5 +24 lines): from ledger.report import month_bounds, monthly_report\n- [t92] (turn 19) edited tests/test_cli.py (-1 +12 lines): class ReportMonthCheckTest(unittest.TestCase):\n- [u20] (turn 20) user: \"We tried caching get_balance with functools.lru_cache last month and it returned stale balances after add(). Do not use lru_cache or any memoization for balances. Run python3 -m unittest discover -s tests -v and summarize the results.\"\n- [u21] (turn 21) user: \"Add a test for get_balance with many accounts and many entries.\"\n- [t99] (turn 21) edited tests/test_store.py (-1 +14 lines): def test_balance_many_accounts_and_entries(self):\n- [u22] (turn 22) user: \"List every TODO or FIXME comment in the repository.\"\n- [u23] (turn 23) user: \"This work is tracked in the ticket FIN-2291. Add a memo length limit of 200 characters in the CLI add command, with a test.\"\n- [t107] (turn 23) edited ledger/cli.py (-2 +4 lines): if args.cmd == \"add\" and len(args.memo) > MAX_MEMO_LENGTH:\n- [t108] (turn 23) edited ledger/cli.py (-4 +6 lines): from .store import Entry\n- [t109] (turn 23) edited tests/test_cli.py (-1 +23 lines): class MemoLengthTest(unittest.TestCase):\n- [u24] (turn 24) user: \"Show me git diff --stat and then the full diff of ledger/report.py.\"\n- [u25] (turn 25) user: \"Write a short CONTRIBUTING.md with how to run the tests.\"\n- [u26] (turn 26) user: \"We'll call the new export command export-csv, not dump. Implement that export command: it writes every entry as CSV to stdout, oldest first.\"\n- [t120] (turn 26) edited ledger/cli.py (-2 +3 lines): sub.add_parser(\"accounts\")\n- [t121] (turn 26) edited ledger/cli.py (-4 +9 lines): elif args.cmd == \"accounts\":\n- [t122] (turn 26) edited ledger/cli.py (-2 +3 lines): import argparse\n- [t123] (turn 26) edited tests/test_cli.py (-1 +21 lines): class ExportCsvTest(unittest.TestCase):\n- [u27] (turn 27) user: \"Add tests for the export command.\"\n- [t127] (turn 27) edited tests/test_cli.py (-4 +51 lines): \"2026-03-15,ACC-2,-425,refund\\n\",\n- [f:scripts/gen_sample.py] (turn 28) file scripts/gen_sample.py: edited (turns 28); used in commands (turns 28)\n- [u28] (turn 28) user: \"Write scripts/gen_sample.py that creates a sample ledger with 300 entries across 5 accounts in March 2026, run it, then run the report for 2026-03 on that db and show me the output.\"\n- [t131] (turn 28) wrote scripts/gen_sample.py (-0 +39 lines)\n- [u29] (turn 29) user: \"All CLI output must stay CSV with a header row. The finance team parses it with a script. Make the report command print a total line at the end.\"\n- [t135] (turn 29) edited ledger/report.py (-5 +6 lines): \"\"\"Render entries as CSV lines: a header row, one row per entry, then a TOTAL row.\"\"\"\n- [t136] (turn 29) Read tests/test_report.py (50 lines)\n- [t137] (turn 29) edited tests/test_report.py (-5 +21 lines): self.assertEqual(\n- [t138] (turn 29) edited tests/test_report.py (-1 +6 lines): [\n- [u30] (turn 30) user: \"Review ledger/cli.py for error handling problems and fix the worst one.\"\n- [t142] (turn 30) Read ledger/cli.py (25 lines)\n- [t143] (turn 30) edited ledger/cli.py (-3 +7 lines): if args.cmd == \"add\":\n- [t144] (turn 30) edited tests/test_cli.py (-1 +23 lines): class AddInputCheckTest(unittest.TestCase):\n- [u31] (turn 31) user: \"Run all tests and show me the full output.\"\n- [u32] (turn 32) user: \"Our fiscal year starts on April 1, so Q1 runs from April to June. Add a quarter option to the report command that reports a whole quarter.\"\n- [t151] (turn 32) Read ledger/report.py (45 lines)\n- [t152] (turn 32) wrote ledger/report.py (-0 +75 lines)\n- [t153] (turn 32) edited ledger/report.py (-7 +9 lines): year, qtr = int(m[1]), int(m[2])\n- [t154] (turn 32) Read ledger/cli.py (60 lines)\n- [t155] (turn 32) Read ledger/cli.py (15 lines)\n- [t156] (turn 32) edited ledger/cli.py (-1 +1 lines): from .report import month_bounds, period_report, quarter_bounds\n- [t157] (turn 32) edited ledger/cli.py (-2 +3 lines): r.add_argument(\"month\", nargs=\"?\")\n- [t158] (turn 32) edited ledger/cli.py (-5 +7 lines): if args.cmd == \"report\":\n- [t159] (turn 32) edited ledger/cli.py (-1 +1 lines): for line in period_report(ledger, bounds):\n- [t160] (turn 32) edited tests/test_report.py (-5 +24 lines): from ledger.report import month_bounds, monthly_report, quarter_bounds, quarterly_report\n- [t161] (turn 32) edited tests/test_report.py (-1 +18 lines): def test_quarterly_report_covers_three_months_inclusive(self):\n- [t162] (turn 32) edited tests/test_cli.py (-1 +44 lines): class ReportQuarterTest(unittest.TestCase):\n- [u33] (turn 33) user: \"Add tests for the quarter option.\"\n- [u34] (turn 34) user: \"Show me the whole current ledger/cli.py.\"\n- [t170] (turn 34) Read ledger/cli.py (80 lines)\n- [u35] (turn 35) user: \"Don't add third-party dependencies to this project; standard library only. Run the full test suite one more time.\"\n- [t173] (turn 35) $ grep -rhoE \"^\\s*(import|from) [A-Za-z_][A-Za-z0-9_.]*\" ledger tests scripts --include=*.py | sed -E 's/^\\s*(import|from) //' | cut -d. -f1 | sort -u; echo \"-... -> exit 0 | OK\n- [r35] (turn 35) assistant: I checked every import in `ledger/`, `tests/`, and `scripts/`. They are all from the standard library, plus the project's own `ledger` package. I didn't add any dependencies. The full suite passes: 45 of 45 tests.\n- [r36] (turn 36) assistant: The CLI has these commands. All of them take a global `--db PATH` option, which defaults to `ledger.json`. - **`add ACCOUNT AMOUNT [--memo TEXT] [--date YYYY-MM-DD]`**: adds an entry and prints it as CSV. The amount is in decimal dollars, such as `12.50`. The memo is limited to 200 characters. The date defaults to today. - **`balance ACCOUNT`**: prints the account's balance in cents as CSV. - **`report MONTH`** or **`report --quarter YYYY-Qn`**: prints the entries for a month (`2026-03`) or a fiscal quarter, with a `TOTAL` row at the end. Fiscal quarters start in April, so `2026-Q1` is Apri...\n## Latest request\n- [u36] (turn 36) user: \"Next I want to work on balance performance and refunds. Before that, summarize the CLI commands we have now in a short list.\"\n",
+ "probe": {
+  "call": {
+   "prompt": "Answer these questions from what you know about this session so far. Do not use any tools. If you do not know an answer, write unknown. Answer each on one line, starting with its number, for example 'Q1: ...'.\n\nQ1: What is the rule about how money amounts are represented in this codebase?\nQ2: Which host and port does the production ledger database live on?\nQ3: What storage backend did we decide on, and why was the alternative rejected?\nQ4: Which directory must we not modify, and which team owns it?\nQ5: Who is the finance contact for report questions?\nQ6: What was the root cause of the missing entries in the monthly report?\nQ7: Which approach to speeding up get_balance was tried and rejected, and why?\nQ8: What is the ticket number for the report work?\nQ9: What name did we choose for the new export command?\nQ10: What format must all CLI output use?\nQ11: On what date does our fiscal year start?\nQ12: What is the rule about adding dependencies?",
+   "ok": true,
+   "result": "Q1: Money is never a float. Amounts are integer cents end to end.\nQ2: unknown\nQ3: We chose SQLite through the sqlite3 module. The JSON-file storage idea was rejected because it corrupted data on concurrent writes.\nQ4: Don't modify anything under `legacy/`. The payments team owns it, and their CI breaks when it changes.\nQ5: Priya Raman.\nQ6: `monthly_report` compared entry dates with `<` against the last day of the month, so entries dated on the last day were dropped.\nQ7: Caching `get_balance` with `functools.lru_cache` was tried and rejected because it returned stale balances after `add()`. Balances must not use `lru_cache` or any memoization.\nQ8: unknown for the report work. FIN-2291 is the ticket you cited when you asked for the memo length limit.\nQ9: `export-csv`, not `dump`.\nQ10: All CLI output must be CSV with a header row, because the finance team parses it with a script.\nQ11: April 1.\nQ12: Don't add third-party dependencies. The project uses the standard library only.",
+   "session_id": "47066ba3-0021-4a56-8236-ac1681e19175",
+   "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 8909,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 926,
+    "output_tokens_details": {
+     "thinking_tokens": 554
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 8909
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 926,
+      "cache_read_input_tokens": 649,
+      "cache_creation_input_tokens": 8909,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 8909,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.001583315,
+   "wall_s": 6.99,
+   "duration_ms": 5405,
+   "num_turns": 1,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 9560,
+   "output_tokens": 926
+  },
+  "answer": "Q1: Money is never a float. Amounts are integer cents end to end.\nQ2: unknown\nQ3: We chose SQLite through the sqlite3 module. The JSON-file storage idea was rejected because it corrupted data on concurrent writes.\nQ4: Don't modify anything under `legacy/`. The payments team owns it, and their CI breaks when it changes.\nQ5: Priya Raman.\nQ6: `monthly_report` compared entry dates with `<` against the last day of the month, so entries dated on the last day were dropped.\nQ7: Caching `get_balance` with `functools.lru_cache` was tried and rejected because it returned stale balances after `add()`. Balances must not use `lru_cache` or any memoization.\nQ8: unknown for the report work. FIN-2291 is the ticket you cited when you asked for the memo length limit.\nQ9: `export-csv`, not `dump`.\nQ10: All CLI output must be CSV with a header row, because the finance team parses it with a script.\nQ11: April 1.\nQ12: Don't add third-party dependencies. The project uses the standard library only.",
+  "scores": {
+   "F1": true,
+   "F2": false,
+   "F3": true,
+   "F4": true,
+   "F5": true,
+   "F6": true,
+   "F7": true,
+   "F8": true,
+   "F9": true,
+   "F10": true,
+   "F11": true,
+   "F12": true
+  },
+  "accuracy": 0.9166666666666666,
+  "carried_tokens": 5928
+ },
+ "followup": {
+  "call": {
+   "prompt": "New task. get_balance is too slow on big ledgers, so make balance lookups fast. Then add a refund command to the CLI, used like `python3 -m ledger.cli --db DB refund ACCOUNT AMOUNT --currency EUR`, which records a refund of that amount converted to USD with the rates in legacy/fx.py; that conversion rounds badly, so make refunds convert correctly. Keep all tests passing and add tests for the new parts.",
+   "ok": true,
+   "result": "Balance lookups are now indexed, and `refund` is added with correct rounding. All 63 tests pass, including new ones for each part. Nothing is committed.\n\n**Balance speed**\n- The CLI was reading the whole JSON file and scanning it on every command. It now uses the SQLite store, which the earlier decision already chose.\n- `get_balance` is a `SUM` over a new `(account, amount)` index, so it's answered from the index alone. On 100k entries, a balance lookup went from 0.264s to 0.0002s in a one-off timing (not a test).\n- No caching or memoization was added.\n\n**Refund command**\n- `refund ACCOUNT AMOUNT --currency CODE [--date YYYY-MM-DD]` stores a negative USD entry with memo `refund 2.50 GBP`, and prints the same CSV header and row as `add`.\n- `--currency` is required. Zero or negative amounts and unknown currencies are rejected before the database is opened.\n- Conversion lives in `ledger/fx.py`. It multiplies in `Decimal` and rounds half-up to the cent. It reads `RATES` from `legacy/fx.py` and does not edit that file.\n- The old path was wrong: the float conversion gave 317 cents for 2.50 GBP, where the correct result is 318. That affected 80 of the 20,000 GBP amounts I checked.\n\n**Changes to be aware of**\n- The default `--db` is now `ledger.db`, since the file is SQLite. Existing JSON files are rejected with a clear error and must be recreated.\n- `scripts/gen_sample.py` now writes SQLite, and it refuses to overwrite an existing file. Before, it overwrote; now re-running it would duplicate rows.\n- `ledger/jsonfile.py` is no longer used by the CLI. I left it in place, so you can delete it if you like.\n- `balance` on a new path now creates an empty database file, which the old JSON path did not do.\n- Unrelated: `__pycache__` files are tracked in git, so they show as modified. I did not touch them.\n\n**Tests:** I added refund tests in `tests/test_cli.py` and `tests/test_fx.py`, plus `accounts()` and index-plan tests in `tests/test_sqlite_store.py`. I also changed one existing export test to read the database as bytes, since it is now binary. The suite passes with `ResourceWarning` treated as an error, after I fixed a connection leak on the non-SQLite error path.",
+   "session_id": "db35cdb0-4c72-40f9-bd9e-6c64ec5be990",
+   "usage": {
+    "input_tokens": 52,
+    "cache_creation_input_tokens": 55275,
+    "cache_read_input_tokens": 1047223,
+    "output_tokens": 28657,
+    "output_tokens_details": {
+     "thinking_tokens": 13609
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 55275
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 1325,
+      "cache_read_input_tokens": 59530,
+      "cache_creation_input_tokens": 738,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 738,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.031715305,
+   "wall_s": 256.65,
+   "duration_ms": 255086,
+   "num_turns": 26,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 1102550,
+   "output_tokens": 28657
+  },
+  "checks": {
+   "violations": {
+    "lru_cache": false,
+    "legacy": false,
+    "float": false,
+    "dependency": false,
+    "csv": false
+   },
+   "n_violations": 0,
+   "third_party_imports": [],
+   "changed_files": [
+    "README.md",
+    "ledger/cli.py",
+    "ledger/fx.py",
+    "ledger/sqlite_store.py",
+    "scripts/gen_sample.py",
+    "tests/test_cli.py",
+    "tests/test_fx.py",
+    "tests/test_sqlite_store.py"
+   ],
+   "refund_ran": true,
+   "refund_output": "date,account,amount_cents,memo\n2026-10-21,ACC-1,-1350,refund 12.50 EUR\n",
+   "refund_error": "",
+   "tests_pass": true,
+   "tests_summary": "OK"
+  }
+ }
+}

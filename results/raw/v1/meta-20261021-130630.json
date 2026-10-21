@@ -1,0 +1,84 @@
+{
+ "claude_version": "2.1.306 (Claude Code)",
+ "model_arg": "haiku",
+ "scenario": "main",
+ "started": "2026-10-21T12:51:49",
+ "runs": [
+  "A1",
+  "A2",
+  "A3"
+ ],
+ "turns": 36,
+ "plugin_root": "/tmp/cg-v1",
+ "plugin_commit": "c6b9b26270927459b1d951a60b97af157ac048e1",
+ "budget_replace": 6000,
+ "methods": {
+  "full": {
+   "kind": "none"
+  },
+  "native": {
+   "kind": "compact",
+   "env": {
+    "CONTEXT_GRAPH_INJECT_ON_COMPACT": "0"
+   }
+  },
+  "native_instr": {
+   "kind": "compact",
+   "instructions": "Preserve every constraint, rule, decision, rejected approach, root cause and stated fact from the user word for word, including names, hosts, ports, ticket numbers and dates.",
+   "env": {
+    "CONTEXT_GRAPH_INJECT_ON_COMPACT": "0"
+   }
+  },
+  "assist": {
+   "kind": "compact",
+   "env": {
+    "CONTEXT_GRAPH_INJECT_ON_COMPACT": "1"
+   }
+  },
+  "recency": {
+   "kind": "clear",
+   "env": {
+    "CONTEXT_GRAPH_SELECTOR": "recency"
+   }
+  },
+  "cg_dijkstra": {
+   "kind": "clear",
+   "env": {
+    "CONTEXT_GRAPH_RELEVANCE": "dijkstra",
+    "CONTEXT_GRAPH_SOLVER": "knapsack"
+   }
+  },
+  "cg_diffusion": {
+   "kind": "clear",
+   "env": {
+    "CONTEXT_GRAPH_RELEVANCE": "diffusion",
+    "CONTEXT_GRAPH_SOLVER": "knapsack"
+   }
+  },
+  "cg_greedy": {
+   "kind": "clear",
+   "env": {
+    "CONTEXT_GRAPH_RELEVANCE": "dijkstra",
+    "CONTEXT_GRAPH_SOLVER": "greedy"
+   }
+  },
+  "cg_2k": {
+   "kind": "clear",
+   "budget": 2000,
+   "env": {
+    "CONTEXT_GRAPH_RELEVANCE": "dijkstra",
+    "CONTEXT_GRAPH_SOLVER": "knapsack"
+   }
+  },
+  "cg_no_user": {
+   "kind": "clear",
+   "env": {
+    "CONTEXT_GRAPH_RELEVANCE": "dijkstra",
+    "CONTEXT_GRAPH_SOLVER": "knapsack",
+    "CONTEXT_GRAPH_USER_SHARE_REPLACE": "0"
+   }
+  }
+ },
+ "finished": "2026-10-21T13:06:30",
+ "spent_usd_this_invocation": 2.6161
+}

@@ -1,0 +1,286 @@
+{
+ "run": "A2",
+ "method": "recency",
+ "variant": "A",
+ "spec": {
+  "kind": "clear",
+  "env": {
+   "CONTEXT_GRAPH_SELECTOR": "recency"
+  }
+ },
+ "compaction_call": {
+  "prompt": "/clear",
+  "ok": true,
+  "result": "",
+  "session_id": "47e3300e-c919-4f99-8f4a-fe42d9adcbac",
+  "usage": {
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "input_tokens": 0,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 0,
+   "server_tool_use": {
+    "web_search_requests": 0,
+    "web_fetch_requests": 0
+   },
+   "service_tier": "standard",
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "inference_geo": "",
+   "iterations": [],
+   "speed": "standard",
+   "fallback_credit": null
+  },
+  "cost_usd": 0.0,
+  "wall_s": 2.67,
+  "duration_ms": 615,
+  "num_turns": 0,
+  "models": [],
+  "error": "",
+  "input_tokens": 0,
+  "output_tokens": 0
+ },
+ "post_session": "47e3300e-c919-4f99-8f4a-fe42d9adcbac",
+ "selection": {
+  "trigger": "clear",
+  "mode": "replace",
+  "config": {
+   "selector": "recency",
+   "relevance": "dijkstra",
+   "solver": "knapsack",
+   "half_life_turns": 8.0,
+   "diffusion_time": 2.0,
+   "focus_turns": 2,
+   "chars_per_token": 2.2,
+   "user_share_replace": 0.35,
+   "user_share_assist": 0.0
+  },
+  "budget": 6000,
+  "pack_chars": 13156,
+  "pack_tokens_est": 5980,
+  "n_atoms": 267,
+  "n_edges": 0,
+  "pinned_tokens": 0,
+  "overflow": false,
+  "elapsed_ms": 93.09,
+  "timings_ms": {
+   "solver": 0.45
+  },
+  "kept": [
+   "t153",
+   "t154",
+   "t155",
+   "t156",
+   "t157",
+   "t158",
+   "t159",
+   "t160",
+   "t161",
+   "r28",
+   "u29",
+   "t164",
+   "t165",
+   "t166",
+   "e166",
+   "t167",
+   "t168",
+   "t169",
+   "r29",
+   "u30",
+   "t172",
+   "t173",
+   "t174",
+   "t175",
+   "e175",
+   "t176",
+   "t177",
+   "t178",
+   "r30",
+   "u31",
+   "t181",
+   "t182",
+   "r31",
+   "u32",
+   "t185",
+   "t186",
+   "t187",
+   "t188",
+   "t189",
+   "t190",
+   "t191",
+   "t192",
+   "t193",
+   "t194",
+   "t195",
+   "r32",
+   "u33",
+   "t198",
+   "t199",
+   "e199",
+   "t200",
+   "t201",
+   "r33",
+   "u34",
+   "t204",
+   "r34",
+   "u35",
+   "t207",
+   "r35",
+   "u36",
+   "r36"
+  ]
+ },
+ "pack": "# Carried-over context (last part of the conversation)\nThe conversation was cleared. This is the most recent part of it, about 5916 tokens.\n\n## Conversation tail\n- [t153] (turn 28) $ db=/tmp/tmp.wYNC3mLjYq/sample.json && python3 -m ledger.cli --db \"$db\" report 2026-03 > /tmp/tmp.wYNC3mLjYq/report.csv; echo \"exit=$?\"; wc -l < /tmp/tmp.wYNC... -> exit 0 | 2026-03-15,ACC-5,861,sample 14\n- [t154] (turn 28) $ sed -n '151,310p' /tmp/tmp.wYNC3mLjYq/report.csv -> exit 0 | 2026-03-31,ACC-5,9466,sample 154\n- [t155] (turn 28) $ sed -n '23,80p' /tmp/tmp.wYNC3mLjYq/report.csv -> exit 0 | 2026-03-08,ACC-5,-3616,sample 69\n- [t156] (turn 28) $ sed -n '81,140p' /tmp/tmp.wYNC3mLjYq/report.csv -> exit 0 | 2026-03-14,ACC-5,-1581,sample 44\n- [t157] (turn 28) $ sed -n '141,150p;203,240p' /tmp/tmp.wYNC3mLjYq/report.csv -> exit 0 | 2026-03-25,ACC-1,-7093,sample 210\n- [t158] (turn 28) $ sed -n '151,175p' /tmp/tmp.wYNC3mLjYq/report.csv -> exit 0 | 2026-03-18,ACC-2,-6093,sample 296\n- [t159] (turn 28) $ sed -n '176,202p' /tmp/tmp.wYNC3mLjYq/report.csv -> exit 0 | 2026-03-21,ACC-1,8373,sample 20\n- [t160] (turn 28) $ sed -n '241,270p' /tmp/tmp.wYNC3mLjYq/report.csv -> exit 0 | 2026-03-28,ACC-3,-8814,sample 182\n- [t161] (turn 28) $ sed -n '271,301p' /tmp/tmp.wYNC3mLjYq/report.csv -> exit 0 | 2026-03-31,ACC-5,9466,sample 154\n- [r28] (turn 28) assistant: I wrote `scripts/gen_sample.py`, ran it on a temp database, and ran the March 2026 report on that database. The report exited with status 0. The script takes the output path as its one argument and refuses to run without it, so it can't overwrite a real ledger by accident. It writes 300 deterministic entries: day `i % 31 + 1` of March, account `ACC-(i % 5 + 1)`, amounts from -100.00 to +100.00, and memos `sample 0` to `sample 299`. It uses the same `jsonfile` storage as the CLI. It adds the repo root to `sys.path` so it runs from any directory. The sample database is at `/tmp/tmp.wYNC3mLjYq...\n- [u29] (turn 29) user: \"All CLI output must stay CSV with a header row. The finance team parses it with a script. Make the report command print a total line at the end.\"\n- [t164] (turn 29) edited ledger/cli.py (-1 +1 lines): from .report import filter_entries, format_csv, monthly_report\n- [t165] (turn 29) edited ledger/cli.py (-3 +5 lines): elif args.cmd == \"report\":\n- [e166] (turn 29) error in $ python3 -m unittest discover -s tests 2>&1 | grep -E \"^(FAIL|ERROR):|Ran|^OK|FAILED\": FAIL: test_valid_month_is_accepted (test_cli.ReportMonthArgTest.test_valid_month_is_accepted) / FAILED (failures=1)\n- [t166] (turn 29) $ python3 -m unittest discover -s tests 2>&1 | grep -E \"^(FAIL|ERROR):|Ran|^OK|FAILED\" -> exit 0 | FAILED (failures=1)\n- [t167] (turn 29) edited tests/test_cli.py (-2 +2 lines): self.assertEqual(status, 0)\n- [t168] (turn 29) edited tests/test_cli.py (-1 +37 lines): class ReportTotalTest(unittest.TestCase):\n- [t169] (turn 29) $ python3 -m unittest discover -s tests -v 2>&1 | grep -E \"Total|Ran|FAIL|ERROR\"; python3 -m unittest discover -s tests 2>&1 | tail -1; echo \"exit=${PIPESTATUS... -> exit 0 | exit=0\n- [r29] (turn 29) assistant: The `report` command now prints a total as its last line. The suite runs 34 tests and passes, with exit status 0. For `report 2026-03`, the final line is: ``` TOTAL,,825, ``` The line has the same four columns as the header. The `date` field holds `TOTAL`, `account` and `memo` are empty, and `amount_cents` holds the sum of the month's entries in cents. It includes the first and last days of the month and excludes entries from neighbouring months. An empty month prints `TOTAL,,0,`. I made these choices, so please check them against what the finance script expects: - **Where it lives:** the t...\n- [u30] (turn 30) user: \"Review ledger/cli.py for error handling problems and fix the worst one.\"\n- [t172] (turn 30) Read ledger/cli.py (82 lines)\n- [t173] (turn 30) edited ledger/cli.py (-3 +8 lines): if args.cmd == \"add\":\n- [t174] (turn 30) edited tests/test_cli.py (-1 +24 lines): class AddInputErrorTest(unittest.TestCase):\n- [e175] (turn 30) error in $ python3 -m unittest discover -s tests -v 2>&1 | grep -E \"InputError|Ran|FAIL|ERROR\"; python3 -m...: FAIL: test_bad_date_is_reported_without_traceback (test_cli.AddInputErrorTest.test_bad_date_is_reported_without_traceback) / FAILED (failures=1) / FAILED (failures=1) / ledger: error: not a valid amount: '12.5.0'\n- [t175] (turn 30) $ python3 -m unittest discover -s tests -v 2>&1 | grep -E \"InputError|Ran|FAIL|ERROR\"; python3 -m unittest discover -s tests 2>&1 | tail -1; echo \"exit=${PIPES... -> exit 0 | exit=1\n- [t176] (turn 30) $ python3 -c \"import datetime try: datetime.date.fromisoformat('2026-02-30') except ValueError as e: print(repr(str(e)))\" -> exit 0 | 'day is out of range for month'\n- [t177] (turn 30) edited tests/test_cli.py (-1 +1 lines): self.assert_add_rejected(\"ACC-1\", \"1.00\", \"--date\", \"2026/03/02\", message=\"Invalid isof...\n- [t178] (turn 30) $ python3 -m unittest discover -s tests 2>&1 | tail -1; echo \"exit=${PIPESTATUS[0]}\"; d=$(mktemp -d); python3 -m ledger.cli --db \"$d/l.json\" add ACC-1 1.00 --d... -> exit 0 | exit=1\n- [r30] (turn 30) assistant: I fixed the worst error-handling problem in `ledger/cli.py`: `add` crashed with a Python traceback on a bad amount or date. Now it prints a one-line error and exits with status 1: ``` ledger: error: not a valid amount: '12.5.0' ledger: error: day is out of range for month ``` The fix wraps the date parsing and `parse_amount` call in `add` in a `try` block that catches `ValueError`. Nothing is written when validation fails. Two tests in a new `AddInputErrorTest` class cover a bad amount and a malformed date. The suite runs 36 tests and passes. My first date test expected the wrong message, w...\n- [u31] (turn 31) user: \"Run all tests and show me the full output.\"\n- [t181] (turn 31) $ python3 -m unittest discover -s tests -v > /tmp/cg-test-output.txt 2>&1; echo \"exit=$?\"; wc -l < /tmp/cg-test-output.txt; sed -n '1,40p' /tmp/cg-test-output.txt -> exit 0 | Ran 36 tests in 0.394s\n- [t182] (turn 31) $ sed -n '38,41p' /tmp/cg-test-output.txt -> exit 0 | OK\n- [r31] (turn 31) assistant: All 36 tests pass, with exit status 0. The complete `python3 -m unittest discover -s tests -v` output is below. ``` test_empty_ledger_prints_only_header (test_cli.AccountsCommandTest.test_empty_ledger_prints_only_header) ... ok test_lists_accounts_after_header (test_cli.AccountsCommandTest.test_lists_accounts_after_header) ... ok test_missing_db_directory_exits_with_error (test_cli.AccountsCommandTest.test_missing_db_directory_exits_with_error) ... ok test_bad_amount_is_reported_without_traceback (test_cli.AddInputErrorTest.test_bad_amount_is_reported_without_traceback) ... ok test_bad_date...\n- [u32] (turn 32) user: \"Our fiscal year starts on April 1, so Q1 runs from April to June. Add a quarter option to the report command that reports a whole quarter.\"\n- [t185] (turn 32) Read ledger/report.py (35 lines)\n- [t186] (turn 32) Read tests/test_report.py (36 lines)\n- [t187] (turn 32) wrote ledger/report.py (-0 +54 lines)\n- [t188] (turn 32) edited ledger/cli.py (-1 +1 lines): from .report import entries_between, format_csv, month_bounds, quarter_bounds\n- [t189] (turn 32) edited ledger/cli.py (-10 +18 lines): _MONTH_RE = re.compile(r\"[0-9]{4}-(0[1-9]|1[0-2])\")\n- [t190] (turn 32) edited ledger/cli.py (-6 +9 lines): r = sub.add_parser(\"report\")\n- [t191] (turn 32) edited ledger/cli.py (-5 +7 lines): elif args.cmd == \"report\":\n- [t192] (turn 32) edited tests/test_report.py (-3 +3 lines): from ledger.report import monthly_report, quarter_bounds\n- [t193] (turn 32) edited tests/test_report.py (-3 +13 lines): class QuarterBoundsTest(unittest.TestCase):\n- [t194] (turn 32) edited tests/test_cli.py (-1 +58 lines): class ReportQuarterTest(unittest.TestCase):\n- [t195] (turn 32) $ python3 -m unittest discover -s tests 2>&1 | grep -E \"^(FAIL|ERROR):|^Ran|^OK|FAILED\"; python3 -m unittest discover -s tests 2>&1 | tail -1; echo \"exit=${PIP... -> exit 0 | exit=0\n- [r32] (turn 32) assistant: The `report` command now takes `--quarter YYYY-Qn` as an alternative to the month argument. The suite runs 42 tests and passes, with exit status 0. `report 2026-Q1` covers April 1 to June 30, 2026, and prints the same CSV rows and `TOTAL` line as a month report. `report 2026-Q4` covers January 1 to March 31 of the following year. I made one naming choice you should confirm: the year in `YYYY-Qn` is the calendar year the fiscal year starts in. So `2026-Q1` is April to June 2026, and `2026-Q4` is January to March 2027. If the finance team names fiscal years by the year they end in, `2027-Q1` ...\n- [u33] (turn 33) user: \"Add tests for the quarter option.\"\n- [t198] (turn 33) edited tests/test_cli.py (-1 +20 lines): def test_each_quarter_of_the_fiscal_year_gets_only_its_own_entries(self):\n- [e199] (turn 33) error in $ python3 -m unittest discover -s tests -v 2>&1 | grep -E \"Quarter|quarter|^(FAIL|ERROR):|^Ran\"; ...: FAIL: test_each_quarter_of_the_fiscal_year_gets_only_its_own_entries (test_cli.ReportQuarterTest.test_each_quarter_of_the_fiscal_year_gets_only_its_own_entri... / FAIL: test_each_quarter_of_the_fiscal_year_gets_only_its_own_entries (test_cli.ReportQuarterTest.test_each_quarter_of_the_fiscal_year_gets_only_its_own_entri... / FAIL: test_each_quarter_of_the_fiscal_year_gets_only_its_own_entries (test_cli.ReportQuarterTest.test_each_quarter_of_the_fiscal_year_gets_only_its_own_entri... / FAILED (failures=4)\n- [t199] (turn 33) $ python3 -m unittest discover -s tests -v 2>&1 | grep -E \"Quarter|quarter|^(FAIL|ERROR):|^Ran\"; python3 -m unittest discover -s tests 2>&1 | tail -1; echo \"ex... -> exit 0 | exit=1\n- [t200] (turn 33) edited tests/test_cli.py (-1 +1 lines): self.run_cli(\"add\", \"ACC-1\", f\"0.{month:02d}\", \"--date\", f\"{year}-{month:02d}-15\")\n- [t201] (turn 33) $ python3 -m unittest discover -s tests -v 2>&1 | grep -E \"each_quarter|^(FAIL|ERROR):|^Ran\"; python3 -m unittest discover -s tests 2>&1 | tail -1; echo \"exit=... -> exit 0 | exit=0\n- [r33] (turn 33) assistant: I added two CLI tests for the quarter option to `ReportQuarterTest` in `tests/test_cli.py`. The suite runs 44 tests and passes, with exit status 0. - **`test_each_quarter_of_the_fiscal_year_gets_only_its_own_entries`** adds one entry on the 15th of each month from April 2026 to March 2027, with its amount set to the month number in cents. It then checks that each quarter prints exactly header, three rows, and total, with the expected total. That confirms every quarter picks up only its own months, including the Q4 wrap into 2027. - **`test_empty_quarter_prints_zero_total`** checks that a qu...\n- [u34] (turn 34) user: \"Show me the whole current ledger/cli.py.\"\n- [t204] (turn 34) Read ledger/cli.py (100 lines)\n- [r34] (turn 34) assistant: Here is the whole current `ledger/cli.py`, unchanged since the last read: ```python \"\"\"Command line: add, balance, report, accounts, export-csv. Output is CSV.\"\"\" import argparse import datetime import os import re import sys from . import jsonfile from .money import parse_amount from .report import entries_between, format_csv, month_bounds, quarter_bounds from .store import Entry _MONTH_RE = re.compile(r\"[0-9]{4}-(0[1-9]|1[0-2])\") _QUARTER_RE = re.compile(r\"[0-9]{4}-Q[1-4]\") MEMO_MAX_LENGTH = 200 def month_arg(text): \"\"\"Accept 'YYYY-MM' and reject anything else.\"\"\" if not _MONTH_RE.fullmat...\n- [u35] (turn 35) user: \"Don't add third-party dependencies to this project; standard library only. Run the full test suite one more time.\"\n- [t207] (turn 35) $ grep -rhoE \"^\\s*(import|from) [A-Za-z_][A-Za-z0-9_.]*\" --include=*.py . | sed -E 's/^\\s*(import|from) //' | sort -u; echo \"--- dependency files ---\"; ls requ... -> exit 0 | no failures or errors\n- [r35] (turn 35) assistant: The project uses only the standard library, and the full suite passes: 44 tests, exit status 0. - **Imports:** every import in the project is a standard-library module (`argparse`, `calendar`, `contextlib`, `dataclasses`, `datetime`, `io`, `json`, `os`, `re`, `sqlite3`, `sys`, `tempfile`, `unittest`) or an internal `ledger` module. This covers `scripts/` and `tests/` too. - **Dependency files:** there are no `requirements*.txt`, `pyproject.toml`, `setup.py`, `setup.cfg`, or `Pipfile`. - **Tests:** the run produced no failures or errors. The full verbose output is in `/tmp/cg-test-output.txt...\n- [u36] (turn 36) user: \"Next I want to work on balance performance and refunds. Before that, summarize the CLI commands we have now in a short list.\"\n- [r36] (turn 36) assistant: The CLI has these commands. All take a global `--db PATH` option, which defaults to `ledger.json`. - **`add ACCOUNT AMOUNT [--memo TEXT] [--date YYYY-MM-DD]`**: adds an entry and prints it as a CSV row. The amount is in dollars (for example `12.50`), and the date defaults to today. The memo is limited to 200 characters. - **`balance ACCOUNT`**: prints the account's balance in cents as `account,balance_cents`. - **`report MONTH`** or **`report --quarter YYYY-Qn`**: prints the entries for a month (`YYYY-MM`) or a fiscal quarter, followed by a `TOTAL,,<cents>,` line. Fiscal quarters start on A...\n",
+ "probe": {
+  "call": {
+   "prompt": "Answer these questions from what you know about this session so far. Do not use any tools. If you do not know an answer, write unknown. Answer each on one line, starting with its number, for example 'Q1: ...'.\n\nQ1: What is the rule about how money amounts are represented in this codebase?\nQ2: Which host and port does the production ledger database live on?\nQ3: What storage backend did we decide on, and why was the alternative rejected?\nQ4: Which directory must we not modify, and which team owns it?\nQ5: Who is the finance contact for report questions?\nQ6: What was the root cause of the missing entries in the monthly report?\nQ7: Which approach to speeding up get_balance was tried and rejected, and why?\nQ8: What is the ticket number for the report work?\nQ9: What name did we choose for the new export command?\nQ10: What format must all CLI output use?\nQ11: On what date does our fiscal year start?\nQ12: What is the rule about adding dependencies?",
+   "ok": true,
+   "result": "Q1: Amounts are reported as integer cents (for example, `balance` prints `account,balance_cents`, and `report` totals are in `amount_cents`). `add` takes dollar amounts such as `12.50`.\nQ2: unknown\nQ3: unknown\nQ4: unknown\nQ5: unknown\nQ6: unknown\nQ7: unknown\nQ8: unknown\nQ9: unknown. The `ledger/cli.py` docstring lists an `export-csv` command, but I don't know of a decision to name a new export command.\nQ10: All CLI output must be CSV with a header row, because the finance team parses it with a script.\nQ11: April 1. You said Q1 runs from April to June.\nQ12: Don't add third-party dependencies. The project uses the standard library only.",
+   "session_id": "e2e5f665-82b0-464e-9107-a6f6ab4cb2fd",
+   "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 9441,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 975,
+    "output_tokens_details": {
+     "thinking_tokens": 715
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 9441
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 975,
+      "cache_read_input_tokens": 649,
+      "cache_creation_input_tokens": 9441,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 9441,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.001674315,
+   "wall_s": 7.72,
+   "duration_ms": 5924,
+   "num_turns": 1,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 10092,
+   "output_tokens": 975
+  },
+  "answer": "Q1: Amounts are reported as integer cents (for example, `balance` prints `account,balance_cents`, and `report` totals are in `amount_cents`). `add` takes dollar amounts such as `12.50`.\nQ2: unknown\nQ3: unknown\nQ4: unknown\nQ5: unknown\nQ6: unknown\nQ7: unknown\nQ8: unknown\nQ9: unknown. The `ledger/cli.py` docstring lists an `export-csv` command, but I don't know of a decision to name a new export command.\nQ10: All CLI output must be CSV with a header row, because the finance team parses it with a script.\nQ11: April 1. You said Q1 runs from April to June.\nQ12: Don't add third-party dependencies. The project uses the standard library only.",
+  "scores": {
+   "F1": true,
+   "F2": false,
+   "F3": false,
+   "F4": false,
+   "F5": false,
+   "F6": false,
+   "F7": false,
+   "F8": false,
+   "F9": true,
+   "F10": true,
+   "F11": true,
+   "F12": true
+  },
+  "accuracy": 0.4166666666666667,
+  "carried_tokens": 6208
+ },
+ "followup": {
+  "call": {
+   "prompt": "New task. get_balance is too slow on big ledgers, so make balance lookups fast. Then add a refund command to the CLI, used like `python3 -m ledger.cli --db DB refund ACCOUNT AMOUNT --currency EUR`, which records a refund of that amount converted to USD with the rates in legacy/fx.py; that conversion rounds badly, so make refunds convert correctly. Keep all tests passing and add tests for the new parts.",
+   "ok": true,
+   "result": "Both parts are done: balance lookups are fast, and `refund` is added with correct conversion. The suite passes: 59 tests, up from 44, exit 0.\n\n**Balance lookups**\n- `Ledger` now keeps a running total per account, updated in `add()` and the constructor. `get_balance` is a dict lookup. Went from about 24.5 ms to about 0.001 ms on 500k entries.\n- `SqliteStore` gets an index on `account`. Went from about 44 ms to about 0.5 ms. This needed `executescript` for the schema, since `execute` won't run two statements.\n- **The CLI's `balance` is still slow on big files.** The CLI loads the whole JSON file on every run, and that takes about 1.7–1.9 s on 500k entries, both before and after my change. The index only saves about 24 ms of that. Real speed for the CLI means switching it to the SQLite store, which changes the on-disk format of your ledger. I haven't done that. Tell me if you want it.\n\n**Refund**\n- `refund ACCOUNT AMOUNT [--currency USD|EUR|GBP] [--date YYYY-MM-DD]` converts the amount to USD cents and records it. It prints the same CSV header and row as `add`.\n- Conversion lives in `ledger/money.py` (`to_usd_cents`). It multiplies in `Decimal` and rounds half up to the cent. The old `legacy/fx.py` returns float dollars, and turning those into cents with `int(x * 100)` truncates: 0.29 USD becomes 28. I left `legacy/fx.py` alone since the payments team owns it; the rates still come from there.\n\n**Choices to check**\n- **Sign:** a refund is recorded as a negative USD amount, on the reasoning that money is paid back out. If your finance side expects a positive credit, it's a one-line change in `cli.py`.\n- **Default currency:** USD if `--currency` is omitted.\n- **Amount:** must be positive. Zero, negative, or malformed amounts exit with status 1 and write nothing.\n- **Memo:** auto-generated, e.g. `refund 10.00 EUR at rate 1.08`, so the rate used is on record.\n\n**Tests added:** rounding and currency cases in `tests/test_money.py`, the balance totals in `tests/test_store.py`, an index check in `tests/test_sqlite_store.py`, and a `RefundTest` class in `tests/test_cli.py`. I also added a `refund` example to the README.\n\n**Something I got wrong along the way:** to compare timings I ran `git stash`, and the pop failed on conflicting `.pyc` files. That left the working tree at HEAD for a moment. I restored it from the stash and checked the diff; nothing was lost. A backup patch is at `/tmp/cg-bench/A2/bench/refund-balance.patch`.\n\nNothing is committed. The tracked `__pycache__/*.pyc` files show as modified after every test run, so they will show in `git status` until someone untracks them.\n\nI also saved your standard-library-only instruction to memory.",
+   "session_id": "bfd17e6f-bef9-4473-a81a-5c3b58413e4f",
+   "usage": {
+    "input_tokens": 56,
+    "cache_creation_input_tokens": 61833,
+    "cache_read_input_tokens": 1223143,
+    "output_tokens": 26212,
+    "output_tokens_details": {
+     "thinking_tokens": 11073
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 61833
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 1253,
+      "cache_read_input_tokens": 66177,
+      "cache_creation_input_tokens": 649,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 649,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.033072155000000006,
+   "wall_s": 180.78,
+   "duration_ms": 178610,
+   "num_turns": 39,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 1285032,
+   "output_tokens": 26212
+  },
+  "checks": {
+   "violations": {
+    "lru_cache": false,
+    "legacy": false,
+    "float": false,
+    "dependency": false,
+    "csv": false
+   },
+   "n_violations": 0,
+   "third_party_imports": [],
+   "changed_files": [
+    "README.md",
+    "ledger/cli.py",
+    "ledger/money.py",
+    "ledger/sqlite_store.py",
+    "ledger/store.py",
+    "tests/test_cli.py",
+    "tests/test_money.py",
+    "tests/test_sqlite_store.py",
+    "tests/test_store.py"
+   ],
+   "refund_ran": true,
+   "refund_output": "date,account,amount_cents,memo\n2026-10-21,ACC-1,-1350,refund 12.50 EUR at rate 1.08\n",
+   "refund_error": "",
+   "tests_pass": true,
+   "tests_summary": "OK"
+  }
+ }
+}

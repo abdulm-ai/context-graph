@@ -1,0 +1,156 @@
+{
+ "run": "B1",
+ "method": "full",
+ "variant": "B",
+ "spec": {
+  "kind": "none"
+ },
+ "post_session": "cb00276e-0ef4-433b-ad39-0e52800c5984",
+ "probe": {
+  "call": {
+   "prompt": "Answer these questions from what you know about this session so far. Do not use any tools. If you do not know an answer, write unknown. Answer each on one line, starting with its number, for example 'Q1: ...'.\n\nQ1: What is the rule about how money amounts are represented in this codebase?\nQ2: Which host and port does the production ledger database live on?\nQ3: What storage backend did we decide on, and why was the alternative rejected?\nQ4: Which directory must we not modify, and which team owns it?\nQ5: Who is the finance contact for report questions?\nQ6: What was the root cause of the missing entries in the monthly report?\nQ7: Which approach to speeding up get_balance was tried and rejected, and why?\nQ8: What is the ticket number for the report work?\nQ9: What name did we choose for the new export command?\nQ10: What format must all CLI output use?\nQ11: On what date does our fiscal year start?\nQ12: What is the rule about adding dependencies?",
+   "ok": true,
+   "result": "Q1: Money amounts are integer cents end to end, and floats are never used for money.\nQ2: The production ledger database lives on host ledger-db-07.internal, port 6432.\nQ3: We decided on SQLite through the sqlite3 module; the JSON-file storage was rejected because it corrupted data on concurrent writes.\nQ4: Do not modify anything under legacy/; the payments team owns it.\nQ5: Priya Raman.\nQ6: monthly_report compared entry dates with < against the last day of the month, so entries dated on the last day were dropped.\nQ7: functools.lru_cache on get_balance was tried and rejected because it returned stale balances after add().\nQ8: FIN-2291.\nQ9: export-csv.\nQ10: All CLI output must stay CSV with a header row, because the finance team parses it with a script.\nQ11: April 1.\nQ12: Do not add third-party dependencies; the project is standard library only.",
+   "session_id": "c45322cd-aa18-4308-b6b1-18d0abb6288a",
+   "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 91741,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 313,
+    "output_tokens_details": {
+     "thinking_tokens": 0
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 91741
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 313,
+      "cache_read_input_tokens": 649,
+      "cache_creation_input_tokens": 91741,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 91741,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.13421208000000004,
+   "wall_s": 5.47,
+   "duration_ms": 3713,
+   "num_turns": 1,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 92392,
+   "output_tokens": 313
+  },
+  "answer": "Q1: Money amounts are integer cents end to end, and floats are never used for money.\nQ2: The production ledger database lives on host ledger-db-07.internal, port 6432.\nQ3: We decided on SQLite through the sqlite3 module; the JSON-file storage was rejected because it corrupted data on concurrent writes.\nQ4: Do not modify anything under legacy/; the payments team owns it.\nQ5: Priya Raman.\nQ6: monthly_report compared entry dates with < against the last day of the month, so entries dated on the last day were dropped.\nQ7: functools.lru_cache on get_balance was tried and rejected because it returned stale balances after add().\nQ8: FIN-2291.\nQ9: export-csv.\nQ10: All CLI output must stay CSV with a header row, because the finance team parses it with a script.\nQ11: April 1.\nQ12: Do not add third-party dependencies; the project is standard library only.",
+  "scores": {
+   "F1": true,
+   "F2": true,
+   "F3": true,
+   "F4": true,
+   "F5": true,
+   "F6": true,
+   "F7": true,
+   "F8": true,
+   "F9": true,
+   "F10": true,
+   "F11": true,
+   "F12": true
+  },
+  "accuracy": 1.0,
+  "carried_tokens": 88758
+ },
+ "followup": {
+  "call": {
+   "prompt": "New task. get_balance is too slow on big ledgers, so make balance lookups fast. Then add a refund command to the CLI, used like `python3 -m ledger.cli --db DB refund ACCOUNT AMOUNT --currency EUR`, which records a refund of that amount converted to USD with the rates in legacy/fx.py; that conversion rounds badly, so make refunds convert correctly. Keep all tests passing and add tests for the new parts.",
+   "ok": true,
+   "result": "Both parts are done, and the suite runs 60 tests, all passing.\n\n**Balance performance.** `Ledger` now keeps a running total per account, which `add()` updates. `get_balance` is a dictionary lookup instead of a scan of every entry. On a 100,000-entry ledger, 1,000 lookups took 0.0003s, against 4.6s for the scan. `SqliteStore` also has an index on `account`, and I confirmed that the balance query uses it.\n\nEntries are now read-only from outside the class, because appending to the list directly would leave the totals out of date. `ledger.entries` returns a tuple.\n\n**Refund command.** Usage:\n\n```\npython3 -m ledger.cli --db DB refund ACCOUNT AMOUNT [--currency EUR] [--memo TEXT] [--date YYYY-MM-DD]\n```\n\n- The amount is positive and in the given currency. It is converted to USD and stored as a negative entry, so it reduces the balance. Currency defaults to USD, is case-insensitive, and an unknown currency is an error.\n- The default memo is like `refund 10 EUR`.\n- Zero, negative, or invalid amounts, unknown currencies, and long memos exit with code 1 and write nothing.\n\n**Conversion.** `ledger/currency.py` converts with exact decimal arithmetic and rounds half-up to whole cents. For example, 50 GBP cents × 1.27 = 63.5, which becomes 64. The old `legacy/fx.py` `to_usd` works in floats and rounds to 2 decimal places, which makes it inexact. I did not change `legacy/fx.py`. The new module reads the same `RATES` dict from it, so changing the payments team's rates changes ours too. It also means `ledger` now imports from `legacy`, so both packages have to be on the path together.\n\n**Tests.** I added `tests/test_currency.py` for the conversions, including the half-cent case. I added refund tests to `tests/test_cli.py`, covering stored sign, currency conversion, memos, and each rejection path. I added tests to `test_store.py` for balances after seeding and for the snapshot, and to `test_sqlite_store.py` for the index.\n\nTwo things to decide:\n- The CLI still stores data in JSON. The SQLite store has the index, but the CLI doesn't use it yet.\n- The `refund` amount is a positive number. If you want refunds entered as signed values instead, that's a small change.",
+   "session_id": "5f511845-0e87-4dd0-9d3a-c960588ee894",
+   "usage": {
+    "input_tokens": 16,
+    "cache_creation_input_tokens": 15193,
+    "cache_read_input_tokens": 896633,
+    "output_tokens": 13369,
+    "output_tokens_details": {
+     "thinking_tokens": 5127
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 15193
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 811,
+      "cache_read_input_tokens": 120688,
+      "cache_creation_input_tokens": 555,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 555,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.21033904000000003,
+   "wall_s": 67.79,
+   "duration_ms": 65880,
+   "num_turns": 19,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 911842,
+   "output_tokens": 13369
+  },
+  "checks": {
+   "violations": {
+    "lru_cache": false,
+    "legacy": false,
+    "float": false,
+    "dependency": false,
+    "csv": false
+   },
+   "n_violations": 0,
+   "third_party_imports": [],
+   "changed_files": [
+    "ledger/cli.py",
+    "ledger/currency.py",
+    "ledger/sqlite_store.py",
+    "ledger/store.py",
+    "tests/test_cli.py",
+    "tests/test_currency.py",
+    "tests/test_sqlite_store.py",
+    "tests/test_store.py"
+   ],
+   "refund_ran": true,
+   "refund_output": "date,account,amount_cents,memo\n2026-10-21,ACC-1,-1350,refund 12.50 EUR\n",
+   "refund_error": "",
+   "tests_pass": true,
+   "tests_summary": "OK"
+  }
+ }
+}

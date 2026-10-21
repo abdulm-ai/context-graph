@@ -1,0 +1,155 @@
+{
+ "run": "A1",
+ "method": "full",
+ "variant": "A",
+ "spec": {
+  "kind": "none"
+ },
+ "post_session": "e051ccef-83fb-4fd7-b5ca-721c91231d8c",
+ "probe": {
+  "call": {
+   "prompt": "Answer these questions from what you know about this session so far. Do not use any tools. If you do not know an answer, write unknown. Answer each on one line, starting with its number, for example 'Q1: ...'.\n\nQ1: What is the rule about how money amounts are represented in this codebase?\nQ2: Which host and port does the production ledger database live on?\nQ3: What storage backend did we decide on, and why was the alternative rejected?\nQ4: Which directory must we not modify, and which team owns it?\nQ5: Who is the finance contact for report questions?\nQ6: What was the root cause of the missing entries in the monthly report?\nQ7: Which approach to speeding up get_balance was tried and rejected, and why?\nQ8: What is the ticket number for the report work?\nQ9: What name did we choose for the new export command?\nQ10: What format must all CLI output use?\nQ11: On what date does our fiscal year start?\nQ12: What is the rule about adding dependencies?",
+   "ok": true,
+   "result": "Q1: Money amounts are integer cents everywhere, and floats are never used for money.\nQ2: The production ledger database is on host ledger-db-07.internal, port 6432. You told me this, and I did not verify it.\nQ3: We chose SQLite via the sqlite3 module. The JSON-file storage was rejected because it corrupted data on concurrent writes.\nQ4: Do not modify anything under legacy/. The payments team owns it.\nQ5: Priya Raman is the finance contact for report questions.\nQ6: monthly_report compared entry dates with `<` against the last day of the month, so entries dated on the last day were dropped.\nQ7: Caching get_balance with functools.lru_cache was tried and rejected because it returned stale balances after add().\nQ8: unknown. FIN-2291 was given for the memo length limit work, not explicitly for the report work.\nQ9: The new export command is named export-csv, not dump.\nQ10: All CLI output must be CSV with a header row.\nQ11: The fiscal year starts on April 1.\nQ12: Standard library only. Do not add third-party dependencies.",
+   "session_id": "3ff0b153-4bdd-46a2-91e7-f0a562752e04",
+   "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 85721,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 749,
+    "output_tokens_details": {
+     "thinking_tokens": 380
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 85721
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 749,
+      "cache_read_input_tokens": 649,
+      "cache_creation_input_tokens": 85721,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 85721,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.106067255,
+   "wall_s": 6.42,
+   "duration_ms": 4599,
+   "num_turns": 1,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 86372,
+   "output_tokens": 749
+  },
+  "answer": "Q1: Money amounts are integer cents everywhere, and floats are never used for money.\nQ2: The production ledger database is on host ledger-db-07.internal, port 6432. You told me this, and I did not verify it.\nQ3: We chose SQLite via the sqlite3 module. The JSON-file storage was rejected because it corrupted data on concurrent writes.\nQ4: Do not modify anything under legacy/. The payments team owns it.\nQ5: Priya Raman is the finance contact for report questions.\nQ6: monthly_report compared entry dates with `<` against the last day of the month, so entries dated on the last day were dropped.\nQ7: Caching get_balance with functools.lru_cache was tried and rejected because it returned stale balances after add().\nQ8: unknown. FIN-2291 was given for the memo length limit work, not explicitly for the report work.\nQ9: The new export command is named export-csv, not dump.\nQ10: All CLI output must be CSV with a header row.\nQ11: The fiscal year starts on April 1.\nQ12: Standard library only. Do not add third-party dependencies.",
+  "scores": {
+   "F1": true,
+   "F2": true,
+   "F3": true,
+   "F4": true,
+   "F5": true,
+   "F6": true,
+   "F7": true,
+   "F8": true,
+   "F9": true,
+   "F10": true,
+   "F11": true,
+   "F12": true
+  },
+  "accuracy": 1.0,
+  "carried_tokens": 82737
+ },
+ "followup": {
+  "call": {
+   "prompt": "New task. get_balance is too slow on big ledgers, so make balance lookups fast. Then add a refund command to the CLI, used like `python3 -m ledger.cli --db DB refund ACCOUNT AMOUNT --currency EUR`, which records a refund of that amount converted to USD with the rates in legacy/fx.py; that conversion rounds badly, so make refunds convert correctly. Keep all tests passing and add tests for the new parts.",
+   "ok": true,
+   "result": "Balance lookups now only sum that account's entries, and refunds convert exactly. The suite runs 55 tests, all passing.\n\n**Balance performance**\n- `Ledger.get_balance` used to scan every entry. It now reads a per-account index that `add()` keeps up to date, so it only touches that account's entries.\n- I didn't store running totals. A stored total is a cache, which is the kind of thing that went stale with `lru_cache`.\n- The SQLite store gets an index on `account`, so its balance query also reads only that account's rows.\n- I haven't timed this on a large ledger. The CLI still loads the whole JSON file on every command, so for big ledgers the load will likely dominate the cost, not the lookup. Moving the CLI to SQLite would fix that, and I can do it if you want.\n\n**Refund command**\n```\npython3 -m ledger.cli --db DB refund ACCOUNT AMOUNT --currency EUR\n```\n- It converts the amount to USD cents with exact `Decimal` arithmetic, rounding half up. The old `round(amount * rate, 2)` with floats is what gave bad results.\n- `--currency` defaults to `USD` and accepts only the currencies in the rate table. `--memo` defaults to `refund EUR`, and `--date` defaults to today.\n- Output is the same CSV as `add`.\n\nDecisions to check:\n- **Sign:** a refund is recorded as a negative USD entry, so it reduces the account's balance. For example, `add ACC-1 10.00` then `refund ACC-1 10.00 --currency EUR` leaves a balance of `-80`. If refunds should go the other way, it's a one-line change.\n- **Positive amounts only:** the refund amount must be positive, so `refund ACC-1 -5` is rejected.\n- **Rates source:** I import `RATES` from `legacy/fx.py` read-only and didn't edit that file. Its `to_usd` function still uses floats, and I didn't touch it. If the payments team changes a rate, refunds follow it automatically.\n\nI added tests for the conversion and half-up rounding, the index, and the refund command's output, balance effect, defaults, and rejected inputs.",
+   "session_id": "c769efa4-4526-480b-8704-2f58ac99179f",
+   "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 13602,
+    "cache_read_input_tokens": 527643,
+    "output_tokens": 11500,
+    "output_tokens_details": {
+     "thinking_tokens": 4673
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 13602
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 827,
+      "cache_read_input_tokens": 110374,
+      "cache_creation_input_tokens": 3801,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 3801,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.15860934000000002,
+   "wall_s": 49.99,
+   "duration_ms": 48152,
+   "num_turns": 18,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 541255,
+   "output_tokens": 11500
+  },
+  "checks": {
+   "violations": {
+    "lru_cache": false,
+    "legacy": false,
+    "float": false,
+    "dependency": false,
+    "csv": false
+   },
+   "n_violations": 0,
+   "third_party_imports": [],
+   "changed_files": [
+    "ledger/cli.py",
+    "ledger/money.py",
+    "ledger/sqlite_store.py",
+    "ledger/store.py",
+    "tests/test_cli.py",
+    "tests/test_money.py",
+    "tests/test_sqlite_store.py"
+   ],
+   "refund_ran": true,
+   "refund_output": "date,account,amount_cents,memo\n2026-10-21,ACC-1,-1350,refund EUR\n",
+   "refund_error": "",
+   "tests_pass": true,
+   "tests_summary": "OK"
+  }
+ }
+}

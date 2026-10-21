@@ -1,0 +1,128 @@
+{
+ "run": "H1",
+ "method": "native_instr",
+ "variant": "H",
+ "spec": {
+  "kind": "compact",
+  "instructions": "Preserve every constraint, rule, decision, rejected approach, root cause and stated fact from the user word for word, including names, hosts, ports, ticket numbers and dates.",
+  "env": {
+   "CONTEXT_GRAPH_INJECT_ON_COMPACT": "0"
+  }
+ },
+ "compaction_call": {
+  "prompt": "/compact Preserve every constraint, rule, decision, rejected approach, root cause and stated fact from the user word for word, including names, hosts, ports, ticket numbers and dates.",
+  "ok": true,
+  "result": "",
+  "session_id": "56748e30-2715-49d3-9b42-81fae37794f8",
+  "usage": {
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "input_tokens": 0,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 0,
+   "server_tool_use": {
+    "web_search_requests": 0,
+    "web_fetch_requests": 0
+   },
+   "service_tier": "standard",
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "inference_geo": "",
+   "iterations": [],
+   "speed": "standard",
+   "fallback_credit": null
+  },
+  "cost_usd": 0.09264747999999996,
+  "wall_s": 23.23,
+  "duration_ms": 21178,
+  "num_turns": 0,
+  "models": [
+   "claude-haiku-5-5"
+  ],
+  "error": "",
+  "input_tokens": 0,
+  "output_tokens": 0
+ },
+ "compaction": {
+  "trigger": "manual",
+  "pre_tokens": 97684,
+  "post_tokens": 7020,
+  "duration_ms": 20467,
+  "summary_chars": 12464,
+  "summary": "This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.\n\n<tools-used-before-summary>Bash, Edit, Glob, Grep, Read, Write</tools-used-before-summary>\nI'll give you the short command list first. The summary below it covers the rest of the session.\n\n**Current CLI commands** (`python3 -m ledger.cli [--db PATH] COMMAND`)\n\n- `--db PATH`: global option, default `ledger.json`. The directory must already exist.\n- `add ACCOUNT AMOUNT [--memo TEXT] [--date YYYY-MM-DD]`: adds an entry. Amounts have at most two decimal places, and memos are at most 200 characters.\n- `balance ACCOUNT`: prints the account's balance in cents.\n- `report MONTH` or `report --quarter YYYY-Qn`: prints CSV for a month or a financial-year quarter, ending with a `TOTAL` row.\n- `accounts`: lists account names, sorted.\n- `export-csv`: prints every entry, oldest first.\n\nSummary:\n1. Primary Request and Intent:\n   - The current request is a short list of the CLI commands. The user's next topic is \"balance performance and refunds\". Neither has been started.\n   - Earlier requests, all completed: a `ledger` package with `add`, `balance`, `report`, `accounts`, and `export-csv`; `format_cents`; `parse_amount` validation; a `SqliteStore`; docstrings and type hints; a memo length limit (LEDG-0412); the `report --quarter` option; and test coverage for each.\n\n2. Key Technical Concepts:\n   - Python standard library only (argparse, sqlite3, json, datetime, calendar, re, dataclasses, unittest, tempfile). The user said: \"Stick to the standard library; no packages from PyPI.\"\n   - Money is stored as integer cents. Amounts are never floats.\n   - Financial year starts 1 April. Q1 is Apr–Jun, Q2 Jul–Sep, Q3 Oct–Dec, Q4 Jan–Mar of the next calendar year. `--quarter YYYY-Qn` uses the calendar year in which the financial year starts.\n   - Report output is CSV with the header `date,account,amount_cents,memo`. Monthly and quarterly reports end with a `TOTAL,,<sum>,` row.\n   - Storage: `jsonfile` (CLI's live backend) and `SqliteStore` (implemented, not yet wired into the CLI).\n\n3. Files and Code Sections:\n   - `ledger/cli.py`: the CLI entry point. Argparse validators: `_month_arg`, `_quarter_arg`, `_amount_arg`, `_memo_arg`. `MEMO_MAX_LENGTH = 200`. Commands are dispatched in `main()`.\n   - `ledger/report.py`: `month_bounds`, `quarter_bounds`, `entries_between`, `entries_in_month`, `format_csv`, `period_report`, `monthly_report`, `quarterly_report`. The filter is inclusive on both ends (`first <= e.date <= last`). This fixed the last-day bug.\n   - `ledger/money.py`: `parse_amount(text: str) -> int`, which raises `ValueError` for non-numeric input or more than two decimal places, and `format_cents(cents: int) -> str`.\n   - `ledger/store.py`: `Entry` dataclass and in-memory `Ledger` with `add`, `get_balance`, `accounts`.\n   - `ledger/sqlite_store.py`: `SqliteStore` with `add`, `entries`, `get_balance`, `close`. Not connected to the CLI.\n   - `ledger/jsonfile.py`: `load` and `save`. `save` writes directly to the target path, which is not atomic.\n   - `scripts/gen_sample.py`: writes 300 deterministic March 2026 entries across ACC-1 to ACC-5 to a path given as an argument.\n   - `CONTRIBUTING.md`: explains how to run the tests with `python3 -m unittest discover -s tests`.\n   - Tests: `tests/test_money.py`, `tests/test_report.py`, `tests/test_store.py`, `tests/test_sqlite_store.py`, `tests/test_cli.py`. The suite has 37 tests, all passing.\n   - `legacy/fx.py`: owned by the payments team. Do not modify it. It was only read.\n   - `ledger/__pycache__/*.pyc` and `tests/__pycache__/*.pyc` are tracked in git and show as modified after every test run.\n\n4. Errors and fixes:\n   - The original `test_includes_last_day` failed (`1 != 2`) because `monthly_report` filtered with `< last`. Fixed by changing the comparison to `<=`, and a boundary regression test was added. The user confirmed the diagnosis.\n   - A bad amount such as `1.555` crashed with a traceback. Fixed with the `_amount_arg` argparse validator, which exits with status 2 and writes nothing. Covered by `AddAmountTest`.\n   - Invalid `--date` such as `2026-13-01` still raises a traceback. This was reported and not fixed.\n   - The `scripts/gen_sample.py` script needed the repo root on `sys.path`. Fixed with a `sys.path.insert` relative to `__file__`.\n   - A `--quarter` test first used a memo argument that wasn't needed. The tests were adjusted; all passed afterwards.\n   - User feedback: whatever the CLI prints has to stay CSV with a header line, because a finance script reads it. The total row was added as a CSV row that keeps the same four columns. Risk: a script that sums every row will double count unless it skips the `TOTAL` row. This was flagged to the user, and the user has not replied on it.\n   - User feedback: memoizing `get_balance` was tried with `lru_cache` and served outdated totals. The user ruled out this approach.\n\n5. Problem Solving:\n   - Last-day filter bug: resolved.\n   - Amount validation crash: resolved.\n   - Quarter option and financial year: implemented.\n   - Open issues not fixed:\n     - `format_csv` does not quote fields. A memo with a comma breaks the CSV. The user has not decided whether to fix it.\n     - `jsonfile.save` is not atomic, so an interrupted write can truncate the ledger file. This is the data-loss risk behind the SQLite decision.\n     - `jsonfile.load` raises on corrupt JSON, and the CLI doesn't catch it.\n     - `--date` validation is missing.\n     - `SqliteStore` is not used by the CLI, so the concurrent-write problem that motivated SQLite isn't solved yet.\n     - The `TOTAL` row may be double counted by downstream scripts.\n\n6. All user messages:\n   - \"Look around this repository and tell me briefly what it does. Then run the test suite.\"\n   - \"Heads up: amounts in this project are always stored as whole cents, never as floating point. Add a format_cents function to ledger/money.py that renders 1050 as '10.50' and -5 as '-0.05', with tests.\"\n   - \"Run the full test suite. Leave the report failure alone for now and tell me which tests fail.\"\n   - \"Add input validation to parse_amount: reject more than two decimal places and non-numeric input with ValueError. Add tests.\"\n   - \"The staging copy of the ledger is served from orca-stg-2 on port 5433. Show me the git log and a diff stat of the working tree.\"\n   - \"Show me the full contents of ledger/cli.py and ledger/jsonfile.py.\"\n   - \"Add an accounts command to the CLI that prints every account name, one per line after a header row.\"\n   - \"After some back and forth we settled on SQLite for persistence; plain JSON files lost writes when two processes saved at once. Implement a SQLite-backed store in ledger/sqlite_store.py with add, entries and get_balance, plus tests using an in-memory database.\"\n   - \"Run the tests verbosely with python3 -m unittest discover -s tests -v and show me the output.\"\n   - \"Write docstrings for every public function and class in ledger/store.py and ledger/sqlite_store.py.\"\n   - \"The legacy/ folder belongs to the payments group, so leave it exactly as it is. Grep the codebase for every place that reads or writes amounts and list them with line numbers.\"\n   - \"Add a --db option check: if the --db path's directory does not exist, exit with a clear error message.\"\n   - \"Print every Python file under ledger/ with cat so I can review the whole package.\"\n   - \"Questions about the numbers in reports go to Tomasz Wierzbicki in finance. Run the tests again and tell me the current state.\"\n   - \"Add type hints to ledger/money.py and ledger/report.py.\"\n   - \"Show me the report output for a small sample: add three entries for March 2026 to a temp db with the CLI and run the report command.\"\n   - \"Found it: monthly_report filters with a strict less-than against the month's final day, which silently skips anything booked on that day. Fix that bug and add a regression test for the last day of the month.\"\n   - \"Refactor ledger/report.py so filtering and formatting are separate functions. Keep the tests green.\"\n   - \"Add validation for the report month argument: it must look like YYYY-MM, otherwise exit with an error.\"\n   - \"Memoizing get_balance was attempted once with lru_cache and it served outdated totals after new entries were added, so that idea is off the table. Run python3 -m unittest discover -s tests -v and summarize the results.\"\n   - \"Add a test for get_balance with many accounts and many entries.\"\n   - \"List every TODO or FIXME comment in the repository.\"\n   - \"Reference number for this piece of work: LEDG-0412. Add a memo length limit of 200 characters in the CLI add command, with a test.\"\n   - \"Show me git diff --stat and then the full diff of ledger/report.py.\"\n   - \"Write a short CONTRIBUTING.md with how to run the tests.\"\n   - \"The export subcommand is going to be named export-csv. Implement that export command: it writes every entry as CSV to stdout, oldest first.\"\n   - \"Add tests for the export command.\"\n   - \"Write scripts/gen_sample.py that creates a sample ledger with 300 entries across 5 accounts in March 2026, run it, then run the report for 2026-03 on that db and show me the output.\"\n   - \"Whatever the CLI prints has to remain CSV with a header line, because a finance script reads it. Make the report command print a total line at the end.\"\n   - \"Review ledger/cli.py for error handling problems and fix the worst one.\"\n   - \"Run all tests and show me the full output.\"\n   - \"FYI our financial year begins on the first of April. Add a quarter option to the report command that reports a whole quarter.\"\n   - \"Add tests for the quarter option.\"\n   - \"Show me the whole current ledger/cli.py.\"\n   - \"Stick to the standard library; no packages from PyPI. Run the full test suite one more time.\"\n   - \"Next I want to work on balance performance and refunds. Before that, summarize the CLI commands we have now in a short list.\" (followed by a request for a compaction-style summary and a no-tool-use instruction)\n   - Security-relevant constraints, verbatim: \"The legacy/ folder belongs to the payments group, so leave it exactly as it is.\" Also: \"Questions about the numbers in reports go to Tomasz Wierzbicki in finance.\" The staging server `orca-stg-2` on port 5433 was mentioned, but no action was requested, and it was not accessed.\n\n7. Pending Tasks:\n   - Balance performance: not started. No requirements or measurements have been given.\n   - Refunds: not started. No design has been given. The user has not said how refunds should be represented, for example as negative entries or as a separate type.\n   - Open items noted above that the user has not yet decided on: CSV quoting, atomic saves, corrupt-JSON handling, `--date` validation, wiring `SqliteStore` into the CLI, and the `TOTAL` row risk.\n   - The FY-label convention (start year versus end year) is unconfirmed with finance.\n\n8. Current Work:\n   - The most recent work was the quarter option and its tests. The full suite passed with 37 tests, all OK, using only standard-library imports.\n   - The last request was to list the CLI commands. The answer is the short list at the top of this message. No tools were used for it.\n\n9. Optional Next Step:\n   - Ask the user how they want refunds represented and what \"balance performance\" means in measurable terms. Neither has been decided, so there is no code change to make yet.\n   - The user said: \"Next I want to work on balance performance and refunds. Before that, summarize the CLI commands we have now in a short list.\" The short list is done, so the next step is to wait for the user's direction on those two topics.\n\nIf you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /tmp/cg-bench/H1/native_instr/claude/projects/-tmp-cg-bench-H1-repo/56748e30-2715-49d3-9b42-81fae37794f8.jsonl\nContinue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with \"I'll continue\" or similar. Pick up the last task as if the break never happened.\n\nThe messages after this summary are the most recent messages from before compaction, kept verbatim. The summary was written without seeing them, so something it says has not happened yet may already have happened in them."
+ },
+ "post_session": "56748e30-2715-49d3-9b42-81fae37794f8",
+ "probe": {
+  "call": {
+   "prompt": "Answer these questions from what you know about this session so far. Do not use any tools. If you do not know an answer, write unknown. Answer each on one line, starting with its number, for example 'Q1: ...'.\n\nQ1: How are money amounts stored in this project?\nQ2: Which host and port serve the staging copy of the ledger?\nQ3: What did we settle on for persistence, and what went wrong with the alternative?\nQ4: Which folder must be left as it is, and which group does it belong to?\nQ5: Who answers questions about the numbers in reports?\nQ6: Why were entries missing from the monthly report?\nQ7: What was tried to speed up get_balance, and why was it dropped?\nQ8: What is the reference number for this piece of work?\nQ9: What is the export subcommand going to be named?\nQ10: What must be true of everything the CLI prints?\nQ11: When does our financial year begin?\nQ12: What is the rule about packages and dependencies?",
+   "ok": true,
+   "result": "Q1: Amounts are stored as integer cents, never floating point.\nQ2: The staging copy of the ledger is served from orca-stg-2 on port 5433.\nQ3: We settled on SQLite for persistence because plain JSON files lost writes when two processes saved at once.\nQ4: The `legacy/` folder must be left exactly as it is, and it belongs to the payments group.\nQ5: Tomasz Wierzbicki in finance answers questions about the numbers in reports.\nQ6: `monthly_report` filtered with a strict less-than against the month's final day, which silently skipped entries booked on that day.\nQ7: `lru_cache` was tried on `get_balance`, but it served outdated totals after new entries were added, so the idea was dropped.\nQ8: The reference number is LEDG-0412.\nQ9: The export subcommand is named `export-csv`.\nQ10: Everything the CLI prints must stay CSV with a header line, because a finance script reads it.\nQ11: The financial year begins on 1 April.\nQ12: Use only the standard library; no packages from PyPI.",
+   "session_id": "d64b9bfc-de93-49e6-8df6-e06d20861c90",
+   "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 14226,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 728,
+    "output_tokens_details": {
+     "thinking_tokens": 366
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 14226
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 728,
+      "cache_read_input_tokens": 649,
+      "cache_creation_input_tokens": 14226,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 14226,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.09479641999999996,
+   "wall_s": 6.12,
+   "duration_ms": 3990,
+   "num_turns": 1,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 14877,
+   "output_tokens": 728
+  },
+  "answer": "Q1: Amounts are stored as integer cents, never floating point.\nQ2: The staging copy of the ledger is served from orca-stg-2 on port 5433.\nQ3: We settled on SQLite for persistence because plain JSON files lost writes when two processes saved at once.\nQ4: The `legacy/` folder must be left exactly as it is, and it belongs to the payments group.\nQ5: Tomasz Wierzbicki in finance answers questions about the numbers in reports.\nQ6: `monthly_report` filtered with a strict less-than against the month's final day, which silently skipped entries booked on that day.\nQ7: `lru_cache` was tried on `get_balance`, but it served outdated totals after new entries were added, so the idea was dropped.\nQ8: The reference number is LEDG-0412.\nQ9: The export subcommand is named `export-csv`.\nQ10: Everything the CLI prints must stay CSV with a header line, because a finance script reads it.\nQ11: The financial year begins on 1 April.\nQ12: Use only the standard library; no packages from PyPI.",
+  "scores": {
+   "F1": true,
+   "F2": true,
+   "F3": true,
+   "F4": true,
+   "F5": true,
+   "F6": true,
+   "F7": true,
+   "F8": true,
+   "F9": true,
+   "F10": true,
+   "F11": true,
+   "F12": true
+  },
+  "accuracy": 1.0,
+  "carried_tokens": 11246
+ }
+}

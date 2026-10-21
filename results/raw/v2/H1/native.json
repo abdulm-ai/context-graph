@@ -1,0 +1,206 @@
+{
+ "run": "H1",
+ "method": "native",
+ "variant": "H",
+ "spec": {
+  "kind": "compact",
+  "env": {
+   "CONTEXT_GRAPH_INJECT_ON_COMPACT": "0"
+  }
+ },
+ "compaction_call": {
+  "prompt": "/compact",
+  "ok": true,
+  "result": "",
+  "session_id": "56748e30-2715-49d3-9b42-81fae37794f8",
+  "usage": {
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "input_tokens": 0,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 0,
+   "server_tool_use": {
+    "web_search_requests": 0,
+    "web_fetch_requests": 0
+   },
+   "service_tier": "standard",
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 0
+   },
+   "inference_geo": "",
+   "iterations": [],
+   "speed": "standard",
+   "fallback_credit": null
+  },
+  "cost_usd": 0.08238888999999996,
+  "wall_s": 7.73,
+  "duration_ms": 5882,
+  "num_turns": 0,
+  "models": [
+   "claude-haiku-5-5"
+  ],
+  "error": "",
+  "input_tokens": 0,
+  "output_tokens": 0
+ },
+ "compaction": {
+  "trigger": "manual",
+  "pre_tokens": 97684,
+  "post_tokens": 4361,
+  "duration_ms": 5140,
+  "summary_chars": 1826,
+  "summary": "This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.\n\n<tools-used-before-summary>Bash, Edit, Glob, Grep, Read, Write</tools-used-before-summary>\nThe CLI has five commands. All of them take a global `--db PATH` option (default `ledger.json`), and the directory containing that path must exist.\n\n- `add ACCOUNT AMOUNT [--memo TEXT] [--date YYYY-MM-DD]`: adds an entry. The amount has at most two decimal places, and the memo is at most 200 characters. Prints the header and the new row.\n- `balance ACCOUNT`: prints `account,balance_cents`.\n- `report MONTH` or `report --quarter YYYY-Qn`: prints the entries in that month or quarter, followed by a `TOTAL,,<cents>,` row. Quarters follow the April financial year, and `YYYY` is the calendar year the year starts in.\n- `accounts`: prints the header `account`, then each account name in sorted order.\n- `export-csv`: prints every entry, oldest first, with the header.\n\nBalance performance and refunds haven't been started.\n\nIf you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /tmp/cg-bench/H1/native/claude/projects/-tmp-cg-bench-H1-repo/56748e30-2715-49d3-9b42-81fae37794f8.jsonl\nContinue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with \"I'll continue\" or similar. Pick up the last task as if the break never happened.\n\nThe messages after this summary are the most recent messages from before compaction, kept verbatim. The summary was written without seeing them, so something it says has not happened yet may already have happened in them."
+ },
+ "post_session": "56748e30-2715-49d3-9b42-81fae37794f8",
+ "probe": {
+  "call": {
+   "prompt": "Answer these questions from what you know about this session so far. Do not use any tools. If you do not know an answer, write unknown. Answer each on one line, starting with its number, for example 'Q1: ...'.\n\nQ1: How are money amounts stored in this project?\nQ2: Which host and port serve the staging copy of the ledger?\nQ3: What did we settle on for persistence, and what went wrong with the alternative?\nQ4: Which folder must be left as it is, and which group does it belong to?\nQ5: Who answers questions about the numbers in reports?\nQ6: Why were entries missing from the monthly report?\nQ7: What was tried to speed up get_balance, and why was it dropped?\nQ8: What is the reference number for this piece of work?\nQ9: What is the export subcommand going to be named?\nQ10: What must be true of everything the CLI prints?\nQ11: When does our financial year begin?\nQ12: What is the rule about packages and dependencies?",
+   "ok": true,
+   "result": "Q1: Amounts are stored as integer cents.\nQ2: unknown\nQ3: unknown\nQ4: unknown\nQ5: unknown\nQ6: unknown\nQ7: unknown\nQ8: unknown\nQ9: The export subcommand is named `export-csv`.\nQ10: unknown\nQ11: The financial year begins on 1 April.\nQ12: unknown",
+   "session_id": "20a5a30a-aab8-404b-88c4-c1c0ee3f8bb0",
+   "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 10247,
+    "cache_read_input_tokens": 649,
+    "output_tokens": 627,
+    "output_tokens_details": {
+     "thinking_tokens": 499
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 10247
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 627,
+      "cache_read_input_tokens": 649,
+      "cache_creation_input_tokens": 10247,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 10247,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.08398995499999996,
+   "wall_s": 6.28,
+   "duration_ms": 4228,
+   "num_turns": 1,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 10898,
+   "output_tokens": 627
+  },
+  "answer": "Q1: Amounts are stored as integer cents.\nQ2: unknown\nQ3: unknown\nQ4: unknown\nQ5: unknown\nQ6: unknown\nQ7: unknown\nQ8: unknown\nQ9: The export subcommand is named `export-csv`.\nQ10: unknown\nQ11: The financial year begins on 1 April.\nQ12: unknown",
+  "scores": {
+   "F1": true,
+   "F2": false,
+   "F3": false,
+   "F4": false,
+   "F5": false,
+   "F6": false,
+   "F7": false,
+   "F8": false,
+   "F9": true,
+   "F10": false,
+   "F11": true,
+   "F12": false
+  },
+  "accuracy": 0.25,
+  "carried_tokens": 7267
+ },
+ "followup": {
+  "call": {
+   "prompt": "New task. get_balance is too slow on big ledgers, so make balance lookups fast. Then add a refund command to the CLI, used like `python3 -m ledger.cli --db DB refund ACCOUNT AMOUNT --currency EUR`, which records a refund of that amount converted to USD with the rates in legacy/fx.py; that conversion rounds badly, so make refunds convert correctly. Keep all tests passing and add tests for the new parts.",
+   "ok": true,
+   "result": "Balance lookups are now fast, and `refund` is added with correct currency conversion. All 51 tests pass: the 37 existing ones and 14 new ones.\n\n**Balance speed**\n- `Ledger` keeps a running total per account, updated in `add()`. The CLI's `balance` uses it, so the lookup no longer scans every entry. At 300k entries it went from about 14.6 ms to 0.71 µs per call.\n- `SqliteStore` gets an index on `account`. Its balance query was a full table scan, and it now takes about 0.24 ms at 300k entries, down from 25 ms.\n- Limit: the CLI still reads `ledger.json` in full on every run, so a `balance` call still costs one full parse of the file. Making the CLI use the SQLite store would fix that, but it changes the file format, so I haven't done it.\n\n**Refund**\n- `refund ACCOUNT AMOUNT --currency CUR [--memo TEXT] [--date YYYY-MM-DD]` records the USD equivalent as a negative amount, so it reduces the balance.\n- Conversion uses the rates from `legacy/fx.py`, read through `RATES`, in exact decimal arithmetic with half-up rounding to the cent. The new helper is `convert_to_usd_cents` in `ledger/money.py`.\n- The bug in `to_usd`: it rounds a float with `round()`, which rounds half to even. GBP 2.50 is 3.175 USD, so it gives 3.17 where half-up gives 3.18. That happens for 80 of the first 20,000 GBP cent amounts. I didn't change `legacy/fx.py` because the payments team owns it. Anything else that calls `to_usd` still has this bug.\n\n**Choices you may want to change**\n- `--currency` is required, and only currencies in `RATES` are accepted (USD, EUR, GBP).\n- The refund amount must be greater than zero. The sign comes from the refund itself.\n- Ties round away from zero. For example, GBP 1.50 gives 191 cents.\n- I added `--memo` and `--date` to match `add`. The README documents the refund command.\n\n**Other notes**\n- The `__pycache__` files show as modified because the test runs rewrote them. They're tracked in git, which is a repo issue. I haven't committed anything.",
+   "session_id": "1849efdc-fc44-4f1b-ae58-905e59e7f597",
+   "usage": {
+    "input_tokens": 48,
+    "cache_creation_input_tokens": 38158,
+    "cache_read_input_tokens": 782953,
+    "output_tokens": 17372,
+    "output_tokens_details": {
+     "thinking_tokens": 7331
+    },
+    "server_tool_use": {
+     "web_search_requests": 0,
+     "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 38158
+    },
+    "inference_geo": "global",
+    "iterations": [
+     {
+      "input_tokens": 2,
+      "output_tokens": 1007,
+      "cache_read_input_tokens": 41966,
+      "cache_creation_input_tokens": 1185,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 1185,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message"
+     }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+   },
+   "cost_usd": 0.10367896999999995,
+   "wall_s": 104.63,
+   "duration_ms": 102739,
+   "num_turns": 24,
+   "models": [
+    "claude-haiku-5-5"
+   ],
+   "error": "",
+   "input_tokens": 821159,
+   "output_tokens": 17372
+  },
+  "checks": {
+   "violations": {
+    "lru_cache": false,
+    "legacy": false,
+    "float": false,
+    "dependency": false,
+    "csv": false
+   },
+   "n_violations": 0,
+   "third_party_imports": [],
+   "changed_files": [
+    "README.md",
+    "ledger/cli.py",
+    "ledger/money.py",
+    "ledger/sqlite_store.py",
+    "ledger/store.py",
+    "tests/test_cli.py",
+    "tests/test_money.py",
+    "tests/test_sqlite_store.py",
+    "tests/test_store.py"
+   ],
+   "refund_ran": true,
+   "refund_output": "date,account,amount_cents,memo\n2026-10-21,ACC-1,-1350,\n",
+   "refund_error": "",
+   "tests_pass": true,
+   "tests_summary": "OK"
+  }
+ }
+}

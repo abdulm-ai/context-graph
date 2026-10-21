@@ -1,0 +1,53 @@
+{
+ "input_tokens": 3627,
+ "call": {
+  "prompt": "Answer these questions from what you know about this session so far. Do not use any tools. If you do not know an answer, write unknown. Answer each on one line, starting with its number, for example 'Q1: ...'.\n\nQ1: How are money amounts stored in this project?\nQ2: Which host and port serve the staging copy of the ledger?\nQ3: What did we settle on for persistence, and what went wrong with the alternative?\nQ4: Which folder must be left as it is, and which group does it belong to?\nQ5: Who answers questions about the numbers in reports?\nQ6: Why were entries missing from the monthly report?\nQ7: What was tried to speed up get_balance, and why was it dropped?\nQ8: What is the reference number for this piece of work?\nQ9: What is the export subcommand going to be named?\nQ10: What must be true of everything the CLI prints?\nQ11: When does our financial year begin?\nQ12: What is the rule about packages and dependencies?",
+  "ok": true,
+  "result": "Q1: unknown\nQ2: unknown\nQ3: unknown\nQ4: unknown\nQ5: unknown\nQ6: unknown\nQ7: unknown\nQ8: unknown\nQ9: unknown\nQ10: unknown\nQ11: unknown\nQ12: unknown",
+  "session_id": "fa8abcf4-70bd-48c2-aa26-0a9816e90573",
+  "usage": {
+   "input_tokens": 2,
+   "cache_creation_input_tokens": 2976,
+   "cache_read_input_tokens": 649,
+   "output_tokens": 191,
+   "output_tokens_details": {
+    "thinking_tokens": 94
+   },
+   "server_tool_use": {
+    "web_search_requests": 0,
+    "web_fetch_requests": 0
+   },
+   "service_tier": "standard",
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 2976
+   },
+   "inference_geo": "global",
+   "iterations": [
+    {
+     "input_tokens": 2,
+     "output_tokens": 191,
+     "cache_read_input_tokens": 649,
+     "cache_creation_input_tokens": 2976,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 2976,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "type": "message"
+    }
+   ],
+   "speed": "standard",
+   "fallback_credit": null
+  },
+  "cost_usd": 0.00047419,
+  "wall_s": 4.92,
+  "duration_ms": 2845,
+  "num_turns": 1,
+  "models": [
+   "claude-haiku-5-5"
+  ],
+  "error": "",
+  "input_tokens": 3627,
+  "output_tokens": 191
+ }
+}

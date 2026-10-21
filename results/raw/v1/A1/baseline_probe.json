@@ -1,0 +1,53 @@
+{
+ "input_tokens": 3635,
+ "call": {
+  "prompt": "Answer these questions from what you know about this session so far. Do not use any tools. If you do not know an answer, write unknown. Answer each on one line, starting with its number, for example 'Q1: ...'.\n\nQ1: What is the rule about how money amounts are represented in this codebase?\nQ2: Which host and port does the production ledger database live on?\nQ3: What storage backend did we decide on, and why was the alternative rejected?\nQ4: Which directory must we not modify, and which team owns it?\nQ5: Who is the finance contact for report questions?\nQ6: What was the root cause of the missing entries in the monthly report?\nQ7: Which approach to speeding up get_balance was tried and rejected, and why?\nQ8: What is the ticket number for the report work?\nQ9: What name did we choose for the new export command?\nQ10: What format must all CLI output use?\nQ11: On what date does our fiscal year start?\nQ12: What is the rule about adding dependencies?",
+  "ok": true,
+  "result": "Q1: unknown\nQ2: unknown\nQ3: unknown\nQ4: unknown\nQ5: unknown\nQ6: unknown\nQ7: unknown\nQ8: unknown\nQ9: unknown\nQ10: unknown\nQ11: unknown\nQ12: unknown",
+  "session_id": "da57e7cc-3917-4aa2-8a0f-1c8b6c732e31",
+  "usage": {
+   "input_tokens": 2,
+   "cache_creation_input_tokens": 2984,
+   "cache_read_input_tokens": 649,
+   "output_tokens": 204,
+   "output_tokens_details": {
+    "thinking_tokens": 107
+   },
+   "server_tool_use": {
+    "web_search_requests": 0,
+    "web_fetch_requests": 0
+   },
+   "service_tier": "standard",
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 2984
+   },
+   "inference_geo": "global",
+   "iterations": [
+    {
+     "input_tokens": 2,
+     "output_tokens": 204,
+     "cache_read_input_tokens": 649,
+     "cache_creation_input_tokens": 2984,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 2984,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "type": "message"
+    }
+   ],
+   "speed": "standard",
+   "fallback_credit": null
+  },
+  "cost_usd": 0.00048169,
+  "wall_s": 6.47,
+  "duration_ms": 3154,
+  "num_turns": 1,
+  "models": [
+   "claude-haiku-5-5"
+  ],
+  "error": "",
+  "input_tokens": 3635,
+  "output_tokens": 204
+ }
+}
