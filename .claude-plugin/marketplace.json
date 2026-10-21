@@ -4,6 +4,9 @@
     "name": "Abdul M.",
     "url": "https://github.com/abdulm-ai"
   },
+  "metadata": {
+    "description": "context-graph: rebuild Claude Code context after /compact or /clear from a session graph."
+  },
   "plugins": [
     {
       "name": "context-graph",
